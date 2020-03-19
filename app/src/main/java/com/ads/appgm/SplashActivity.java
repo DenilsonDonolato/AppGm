@@ -11,12 +11,10 @@ public class SplashActivity extends AppCompatActivity {
 
     private static final int LOGIN_INTENT_REQUEST = 1;
     boolean validLogin;
-    private final long splashTimeOut = 500L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
 
         //TODO validacao de Login
         validLogin = false;
@@ -26,8 +24,7 @@ public class SplashActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        Handler myHandler = new Handler();
-        myHandler.postDelayed(this::startApp, splashTimeOut);
+        startApp();
     }
 
     private void startApp() {
