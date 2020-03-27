@@ -3,6 +3,9 @@
     android:opacity="opaque">
 
     <item>
+        <color android:color="@color/colorPrimary"/>
+    </item>
+    <item>
         <bitmap
             android:gravity="center"
             android:src="@drawable/logo" />
