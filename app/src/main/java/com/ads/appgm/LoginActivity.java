@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.ads.appgm.util.MaskEditUtil;
 import com.google.android.material.button.MaterialButton;
@@ -16,6 +17,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        Toolbar myToolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
 
         TextInputEditText inputCPF = findViewById(R.id.editTextCPF);
         inputCPF.addTextChangedListener(MaskEditUtil.mask(inputCPF,MaskEditUtil.FORMAT_CPF));

@@ -9,6 +9,8 @@
     android:layout_height="match_parent"
     tools:context=".LoginActivity">
 
+    <include layout="@layout/app_toolbar"/>
+
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imageSmallLogo"
         android:scaleType="fitCenter"
@@ -18,11 +20,11 @@
         app:layout_constraintBottom_toTopOf="@id/layoutCPF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/my_toolbar" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutCPF"
-        style="@style/MyMaterialButton"
+        style="@style/MyMaterialEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:endIconMode="clear_text"
@@ -44,7 +46,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutPassword"
-        style="@style/MyMaterialButton"
+        style="@style/MyMaterialEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:endIconMode="password_toggle"
@@ -66,6 +68,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/buttonLogin"
+        style="@style/MyButtonTheme"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_login"

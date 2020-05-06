@@ -14,7 +14,6 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         //TODO validacao de Login
         validLogin = false;
     }
@@ -27,7 +26,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void startApp() {
-        if(validLogin){
+        if (validLogin) {
             goToMainActivity();
         } else {
             goToLoginActivity();
@@ -36,7 +35,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private void goToLoginActivity() {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-        startActivityForResult(intent,LOGIN_INTENT_REQUEST);
+        startActivityForResult(intent, LOGIN_INTENT_REQUEST);
     }
 
     private void goToMainActivity() {
