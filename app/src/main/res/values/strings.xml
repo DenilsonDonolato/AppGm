@@ -13,4 +13,5 @@
     <string name="login_cpf_hint">CPF</string>
     <string name="button_login">Entrar</string>
     <string name="button_panic">Pânico</string>
+    <string name="funcao_panico">Função Pânico</string>
 </resources>

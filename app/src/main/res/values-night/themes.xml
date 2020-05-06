@@ -42,4 +42,11 @@
         <item name="colorOnSecondary">@color/textColor</item>
         <item name="colorOnSurface">@color/textColor</item>
     </style>
+
+    <style name="textOnScreen" parent="AppTheme.Base">
+        <item name="android:textColor">@color/textColor</item>
+    </style>
+    <style name="panicSwitch" parent="textOnScreen">
+        <item name="android:background">@color/colorDarkBlue</item>
+    </style>
 </resources>

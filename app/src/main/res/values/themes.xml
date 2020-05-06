@@ -32,4 +32,11 @@
         <item name="boxStrokeWidthFocused">0dp</item>
     </style>
 
+    <style name="textOnScreen" parent="AppTheme.Base">
+        <item name="android:textColor">@color/textColorOnLight</item>
+    </style>
+
+    <style name="panicSwitch" parent="textOnScreen">
+        <item name="android:background">@color/colorLightBlue</item>
+    </style>
 </resources>
