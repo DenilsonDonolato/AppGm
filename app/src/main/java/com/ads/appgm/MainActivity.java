@@ -1,6 +1,7 @@
 package com.ads.appgm;
 
 import android.os.Bundle;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -13,5 +14,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
+    }
+
+    @Override
+    protected void onStart() {
+        Button panic = findViewById(R.id.buttonPanic);
+
+        panic.setOnClickListener(new ButtonPanic());
+
+        super.onStart();
     }
 }
