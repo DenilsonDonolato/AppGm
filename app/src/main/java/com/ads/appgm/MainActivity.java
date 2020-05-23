@@ -1,18 +1,26 @@
 package com.ads.appgm;
 
+import android.content.Intent;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.ads.appgm.clickListeners.ButtonPanic;
+import com.ads.appgm.dialog.PermissionDialog;
+import com.ads.appgm.manager.PaniqueManager;
+import com.ads.appgm.manager.PaniqueManagerListener;
+import com.ads.appgm.service.PaniqueQuick;
+import com.ads.appgm.util.SettingsUtils;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PaniqueManagerListener {
     private MaterialButton panicButton;
     private SwitchMaterial panicFunction;
 
@@ -48,24 +56,47 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (isPanicQuickServiceRunning()) {
-            PanicQuick.getInstance().registerTorchieManagerListener(this);
+        if (isPaniqueQuickServiceRunning()) {
+            PaniqueQuick.getInstance().registerPaniqueManagerListener(this);
             if (this.isPanicOn()) {
                 this.setPanicButtonStatus(this.isPanicOn());
             }
         }
-        panicFunction.setChecked(isPanicQuickServiceRunning());
+        panicFunction.setChecked(isPaniqueQuickServiceRunning());
     }
 
     @Override
     protected void onPause() {
-        if (this.isPanicQuickServiceRunning()) {
-            PanicQuick.getInstance().unregisterTorchieManagerListener();
+        if (this.isPaniqueQuickServiceRunning()) {
+            PaniqueQuick.getInstance().unregisterPaniqueManagerListener();
         } else if (this.isPanicOn()) {
-            this.toggleTorch(null);
+            this.togglePanic(null);
         }
         super.onPause();
-        super.onPause();
+    }
+
+    @Override
+    public void onError(String error) {
+        Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPanicStatusChanged(final boolean status) {
+        runOnUiThread(() -> setPanicButtonStatus(status));
+    }
+
+    public void openAccessibilitySettings(View v) {
+        if (panicFunction.isChecked()) {
+            Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+            startActivity(intent);
+        } else {
+            this.showDialogPermission();
+        }
+    }
+
+    private void showDialogPermission() {
+        PermissionDialog permissionDialog = new PermissionDialog();
+        permissionDialog.show(getFragmentManager(), "Permission Dialog");
     }
 
     private void setPanicButtonStatus(boolean enabled) {
@@ -77,15 +108,35 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private boolean isPaniqueQuickServiceRunning() {
+        return PaniqueQuick.getInstance() != null;
+    }
+
+    public void togglePanic(View v) {
+        if (isPaniqueQuickServiceRunning()) {
+            PaniqueQuick.getInstance().togglePanic();
+        } else {
+            PanicManager.getInstance(SettingsUtils.getPanicSource(this), true).setListener(new OutputDeviceListener() {
+                @Override
+                public void onStatusChanged(String deviceType, final boolean status) {
+                    runOnUiThread(() -> setPanicButtonStatus(status));
+                }
+
+                @Override
+                public void onError(String error) {
+                    Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT).show();
+                }
+            });
+            PanicManager.getInstance(SettingsUtils.getPanicSource(this), true).toggle(this);
+        }
+    }
+
     private boolean isPanicOn() {
-        if (isPanicQuickServiceRunning()) {
-            return PanicQuick.getInstance().getPanicStatus();
+        if (isPaniqueQuickServiceRunning()) {
+            return PaniqueQuick.getInstance().getTorchStatus();
         } else {
             return PanicManager.getInstance(SettingsUtils.getPanicSource(this), true).getStatus();
         }
     }
 
-    private boolean isPanicQuickServiceRunning() {
-        return PanicQuick.getInstance() != null;
-    }
 }
