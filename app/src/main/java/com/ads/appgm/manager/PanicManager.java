@@ -19,8 +19,8 @@ public class PanicManager implements CountTimerListener {
         this.setPanicType(panicType);
         this.isEnabled = enable;
 
-        torchTimer = null;
-        torchTimeout = -1;
+        panicTimer = null;
+        panicTimeout = -1;
     }
 
     public static PanicManager getInstance(String panicType, boolean enable) {
