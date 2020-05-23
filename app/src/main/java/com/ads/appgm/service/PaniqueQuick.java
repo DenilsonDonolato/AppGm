@@ -17,6 +17,7 @@ import androidx.media.VolumeProviderCompat;
 import com.ads.appgm.manager.PaniqueManager;
 import com.ads.appgm.manager.PaniqueManagerListener;
 import com.ads.appgm.manager.ScreenState;
+import com.ads.appgm.manager.device.input.event.VolumeKeyEvent;
 
 public class PaniqueQuick extends AccessibilityService implements PaniqueManagerListener {
 

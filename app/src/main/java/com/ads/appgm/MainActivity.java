@@ -40,8 +40,8 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         panicFunction = findViewById(R.id.panic_function);
         panicButton =  findViewById(R.id.buttonPanic);
 
-        transAnimButFlash = (TransitionDrawable) panicButton.getBackground();
-        transAnimButFlash.resetTransition();
+        //transAnimButFlash = (TransitionDrawable) panicButton.getBackground();
+        //transAnimButFlash.resetTransition();
 
         setSupportActionBar(myToolbar);
     }
@@ -104,9 +104,9 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     private void setPanicButtonStatus(boolean enabled) {
         panicButtonStatus = enabled;
         if (panicButtonStatus) {
-            transAnimButFlash.startTransition(btnAnimTime);
+            //transAnimButFlash.startTransition(btnAnimTime);
         } else {
-            transAnimButFlash.reverseTransition(btnAnimTime);
+            //transAnimButFlash.reverseTransition(btnAnimTime);
         }
     }
 
