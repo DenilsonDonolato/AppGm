@@ -71,7 +71,7 @@
             android:layout_height="2dp"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
-            android:background="@color/colorGrey600" />
+            android:background="#757575" />
 
         <TextView
             android:id="@+id/tv_permission_summary"
@@ -86,7 +86,7 @@
             android:layout_height="2dp"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
-            android:background="@color/colorGrey600" />
+            android:background="#757575" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -99,7 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:lineSpacingExtra="5dp"
-                android:text="@string/permission_warn" />
+                android:text="@string/accessibility_service_description_2" />
         </ScrollView>
     </LinearLayout>
 
@@ -129,7 +129,7 @@
             android:paddingRight="8dp"
             android:text="@string/later"
             android:textAllCaps="true"
-            android:textColor="@color/colorTealA200" />
+            android:textColor="#80cbc4" />
 
         <Space
             android:layout_width="8dp"
@@ -148,7 +148,7 @@
             android:paddingRight="8dp"
             android:text="@string/enable"
             android:textAllCaps="true"
-            android:textColor="@color/colorTealA200" />
+            android:textColor="#80cbc4" />
 
     </LinearLayout>
 

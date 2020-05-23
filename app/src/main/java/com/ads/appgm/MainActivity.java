@@ -12,8 +12,10 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.ads.appgm.clickListeners.ButtonPanic;
 import com.ads.appgm.dialog.PermissionDialog;
+import com.ads.appgm.manager.PanicManager;
 import com.ads.appgm.manager.PaniqueManager;
 import com.ads.appgm.manager.PaniqueManagerListener;
+import com.ads.appgm.manager.device.output.OutputDeviceListener;
 import com.ads.appgm.service.PaniqueQuick;
 import com.ads.appgm.util.SettingsUtils;
 import com.google.android.material.button.MaterialButton;
@@ -133,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     private boolean isPanicOn() {
         if (isPaniqueQuickServiceRunning()) {
-            return PaniqueQuick.getInstance().getTorchStatus();
+            return PaniqueQuick.getInstance().getPanicStatus();
         } else {
             return PanicManager.getInstance(SettingsUtils.getPanicSource(this), true).getStatus();
         }

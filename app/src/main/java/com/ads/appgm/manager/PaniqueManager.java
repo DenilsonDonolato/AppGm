@@ -8,6 +8,9 @@ import android.preference.PreferenceManager;
 import androidx.media.VolumeProviderCompat;
 
 import com.ads.appgm.R;
+import com.ads.appgm.manager.device.input.event.VolumeKeyEvent;
+import com.ads.appgm.manager.timer.CountTimer;
+import com.ads.appgm.manager.timer.CountTimerListener;
 import com.ads.appgm.util.SettingsUtils;
 
 public class PaniqueManager implements DeviceManagerListener, CountTimerListener, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -64,7 +67,7 @@ public class PaniqueManager implements DeviceManagerListener, CountTimerListener
     private void setTimeout(int timeoutSec) {
         if (timeoutSec > 0) {
             if (this.wakeLockTimer == null) {
-                this.wakeLockTimer = new CountTimer(WakeLock.TYPE, timeoutSec, this);
+                this.wakeLockTimer = new CountTimer(WakeLockManager.TYPE, timeoutSec, this);
             } else {
                 this.wakeLockTimer.cancel();
             }
@@ -200,7 +203,7 @@ public class PaniqueManager implements DeviceManagerListener, CountTimerListener
 
     @Override
     public void onCountEnd(String id) {
-        if (id.equals(WakeLock.TYPE)) {
+        if (id.equals(WakeLockManager.TYPE)) {
             if (this.getPanicStatus()) {
                 WakeLockManager.getInstance().setHeldOnDemand();
                 DeviceManager.getInstance(this.mContext).setVolumeKeyDeviceEnabled(true);

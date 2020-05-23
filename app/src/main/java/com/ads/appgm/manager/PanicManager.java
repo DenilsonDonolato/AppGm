@@ -3,6 +3,15 @@ package com.ads.appgm.manager;
 import android.content.Context;
 import android.os.Build;
 
+import com.ads.appgm.manager.device.output.OutputDeviceListener;
+import com.ads.appgm.manager.device.output.panic.Panic;
+import com.ads.appgm.manager.device.output.panic.flashlight.Flashlight;
+import com.ads.appgm.manager.device.output.panic.flashlight.Flashlight1;
+import com.ads.appgm.manager.device.output.panic.flashlight.Flashlight2;
+import com.ads.appgm.manager.device.output.panic.screenlight.Screenlight;
+import com.ads.appgm.manager.timer.CountTimer;
+import com.ads.appgm.manager.timer.CountTimerListener;
+
 public class PanicManager implements CountTimerListener {
 
     private static PanicManager mInstance;
@@ -65,10 +74,51 @@ public class PanicManager implements CountTimerListener {
 
         if (this.panicTimer == null) {
             if (this.panicTimeout > 0) {
-                this.panicTimer = new CountTimer(Torch.TYPE, this.panicTimeout, this);
+                this.panicTimer = new CountTimer(Panic.TYPE, this.panicTimeout, this);
                 this.panicTimer.start();
             }
         }
     }
 
+    private void turnOff() {
+        if (this.mPanic != null) {
+            this.mPanic.start(false);
+            this.mPanic = null;
+        }
+    }
+
+    public void toggle(Context context) {
+        if (this.mPanic == null) {
+            this.turnOn(context);
+        } else {
+            if (this.mPanic.getStatus()) {
+                this.turnOff();
+            } else {
+                this.turnOn(context);
+            }
+        }
+    }
+
+    public void setTimeout(int timeoutSec) {
+        this.panicTimeout = timeoutSec;
+    }
+
+    public boolean getStatus() {
+        return this.mPanic != null && this.mPanic.getStatus();
+    }
+
+    public void setListener(OutputDeviceListener listener) {
+        this.mListener = listener;
+        if (this.mPanic != null) {
+            this.mPanic.setListener(listener);
+        }
+    }
+
+    @Override
+    public void onCountEnd(String id) {
+        if (id.equals(Panic.TYPE)) {
+            PanicManager.getInstance(Flashlight.TYPE, true).turnOff();
+            this.panicTimer = null;
+        }
+    }
 }

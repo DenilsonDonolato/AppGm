@@ -15,4 +15,18 @@
     <string name="button_panic">Pânico</string>
     <string name="funcao_panico">Função Pânico</string>
     <string name="proximity_error">Erro</string>
+    <string name="camera_error">Erro na camera</string>
+    <string name="camera_busy">Camera Ocupada</string>
+    <string name="panic_unsupported">Luz não suportada</string>
+    <string name="service_paniquequick_name">Panico rápido</string>
+    <string name="accessibility_service_description_2"><b>Sobre a permissão- </b> \"<i>...observa o texto que você digita &amp; observa suas ações...</i>\"\nAndroid dispara um  \'Evento de Tecla\' somente quando um botão é pressionado. É dessa maneira que o AppGM captura acionamentos das Teclas de Volume.
+        \nEste aplicativo coleta sua localização para enviar à Guarda Municipal em caso de acionamento, nenhuma outra informação é coletada</string>
+    <string name="accessibility_service_description">Quando o Pânico Rápido está ligado, dispare o Pânico pressionando os juntos os botões de Volume</string>
+    <string name="notify_title">Pânico rápido está desativado</string>
+    <string name="notify_text">Toque para ativar o Pânico Rápido</string>
+    <string name="permission">Ativar função de Pânico Rápido?</string>
+    <string name="permission_note">Ative a função Pânico Rápido nos Serviços de Acessibilidade</string>
+    <string name="permission_summary"><b>Uso do Serviço de Acessibilidade</b> \nAppGM precisa de um serviço em seguno plano. Um Serviço de Acessibilidade pode interceptar os pressionamentos de botões, os Serviços em segundo plano comuns não conseguem. Apenas interceptamos os botões de Volume.</string>
+    <string name="later">Mais tarde</string>
+    <string name="enable">Ativar</string>
 </resources>
