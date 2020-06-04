@@ -6,6 +6,8 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.ads.appgm.notification.Notification;
+
 public class SplashActivity extends AppCompatActivity {
 
     private static final int LOGIN_INTENT_REQUEST = 1;
@@ -16,6 +18,8 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //TODO validacao de Login
         validLogin = false;
+        Notification notification = new Notification(this);
+        notification.createNotificationChannel();
     }
 
     @Override
