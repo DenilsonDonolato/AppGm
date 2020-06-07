@@ -24,6 +24,10 @@ package com.ads.appgm.util;
 
 public class Constants {
     public final static String ID_DEVICE = "0";
+    public static final int LOGIN_INTENT_REQUEST = 1;
+    public static final int GPS_PERMISSION_REQUEST = 2;
+    public static final int GPS_TURN_ON = 3;
+
 
     public final static String ID_DEVICE_OUTPUT = "1";
     public final static String ID_DEVICE_OUTPUT_PANIC = "10";

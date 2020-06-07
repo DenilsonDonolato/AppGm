@@ -17,16 +17,20 @@ import com.ads.appgm.manager.PaniqueManagerListener;
 import com.ads.appgm.manager.device.output.OutputDeviceListener;
 import com.ads.appgm.service.PaniqueQuick;
 import com.ads.appgm.util.SettingsUtils;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 
 
 public class MainActivity extends AppCompatActivity implements PaniqueManagerListener {
 
     private ActivityMainBinding binding;
+    public static MainActivity instance;
 
     private TransitionDrawable transAnimButFlash;
 
     boolean panicButtonStatus = false;
     int btnAnimTime = 200;
+    private FusedLocationProviderClient fusedLocationProviderClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         binding.panicFunction.setOnClickListener(this::openAccessibilitySettings);
 
         //transAnimButFlash = (TransitionDrawable) panicButton.getBackground();
@@ -46,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     protected void onStart() {
         Button panic = findViewById(R.id.buttonPanic);
 
-        panic.setOnClickListener(new ButtonPanic());
+        panic.setOnClickListener(new ButtonPanic(fusedLocationProviderClient, this));
 
         super.onStart();
     }
@@ -61,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
             }
         }
         binding.panicFunction.setChecked(isPaniqueQuickServiceRunning());
+        instance=this;
     }
 
     @Override
@@ -71,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
             this.togglePanic(null);
         }
         super.onPause();
+        instance=null;
     }
 
     @Override
@@ -136,5 +144,4 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
             return PanicManager.getInstance(SettingsUtils.getPanicSource(this), true).getStatus();
         }
     }
-
 }

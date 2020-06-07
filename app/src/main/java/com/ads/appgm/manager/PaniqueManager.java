@@ -174,7 +174,7 @@ public class PaniqueManager implements DeviceManagerListener, CountTimerListener
     public void onProximityChanged(boolean status) {
         if (this.togglePanicIssued) {
             if (status) {
-                DeviceManager.getInstance(this.mContext).toggleTorch();
+//                DeviceManager.getInstance(this.mContext).toggleTorch();
             } else {
                 this.mListener.onError(this.mContext.getResources().getString(R.string.proximity_error));
             }

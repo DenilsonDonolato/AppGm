@@ -29,4 +29,10 @@
     <string name="permission_summary"><b>Uso do Serviço de Acessibilidade</b> \nAppGM precisa de um serviço em seguno plano. Um Serviço de Acessibilidade pode interceptar os pressionamentos de botões, os Serviços em segundo plano comuns não conseguem. Apenas interceptamos os botões de Volume.</string>
     <string name="later">Mais tarde</string>
     <string name="enable">Ativar</string>
+    <string name="reason_location">Para sua segurança este aplicativo precisa de permissão de localização o tempo todo.</string>
+    <string name="GPS">GPS</string>
+    <string name="close">Fechar</string>
+    <string name="turn_on_gps">Ativar GPS</string>
+    <string name="reason_gps">Para sua segurança este aplicativo precisa de permissão de localização o tempo todo.</string>
+    <string name="allow_gps">Permitir GPS</string>
 </resources>
