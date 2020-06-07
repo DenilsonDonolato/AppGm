@@ -62,26 +62,14 @@ public class PermissionDialog extends DialogFragment implements View.OnClickList
     public void onClick(View v) {
         if (v == tvPermissionEnable) {
             Handler mHandler = new Handler();
-            mHandler.postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    openAccessibilitySettings();
-                    dismiss();
-                }
-
+            mHandler.postDelayed(() -> {
+                openAccessibilitySettings();
+                dismiss();
             }, 350L);
 
         } else if (v == tvPermissionLater) {
             Handler mHandler = new Handler();
-            mHandler.postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    dismiss();
-                }
-
-            }, 350L);
+            mHandler.postDelayed(() -> dismiss(), 350L);
         }
     }
 

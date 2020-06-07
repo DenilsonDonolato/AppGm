@@ -1,16 +1,16 @@
 package com.ads.appgm.manager.device.input.proximity;
 
-import com.ads.appgm.manager.device.input.InputDevice;
-import com.ads.appgm.manager.timer.CountTimer;
-import com.ads.appgm.manager.timer.CountTimerListener;
-import com.ads.appgm.util.Constants;
-
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.view.InputEvent;
+
+import com.ads.appgm.manager.device.input.InputDevice;
+import com.ads.appgm.manager.timer.CountTimer;
+import com.ads.appgm.manager.timer.CountTimerListener;
+import com.ads.appgm.util.Constants;
 
 import static android.content.Context.SENSOR_SERVICE;
 

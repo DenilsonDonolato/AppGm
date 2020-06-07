@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
     <include
-        android:id="@+id/include"
+        android:id="@+id/toolbar"
         layout="@layout/app_toolbar" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -15,7 +15,6 @@
         style="@style/panicSwitch"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:onClick="openAccessibilitySettings"
         android:paddingStart="32dp"
         android:paddingTop="32dp"
         android:paddingEnd="32dp"
@@ -24,7 +23,6 @@
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.button.MaterialButton
@@ -36,6 +34,6 @@
         app:layout_constraintBottom_toTopOf="@+id/panic_function"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

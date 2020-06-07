@@ -5,32 +5,28 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
+import com.ads.appgm.databinding.ActivityLoginBinding;
 import com.ads.appgm.util.MaskEditUtil;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
 
 public class LoginActivity extends AppCompatActivity {
+
+    private ActivityLoginBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        Toolbar myToolbar = findViewById(R.id.my_toolbar);
-        setSupportActionBar(myToolbar);
+        setSupportActionBar(binding.toolbar.getRoot());
 
-        TextInputEditText inputCPF = findViewById(R.id.editTextCPF);
-        inputCPF.addTextChangedListener(MaskEditUtil.mask(inputCPF,MaskEditUtil.FORMAT_CPF));
-        inputCPF.setOnFocusChangeListener(this::onFocusChange);
+        binding.editTextCPF.addTextChangedListener(MaskEditUtil.mask(binding.editTextCPF,MaskEditUtil.FORMAT_CPF));
+        binding.editTextCPF.setOnFocusChangeListener(this::onFocusChange);
 
-        TextInputEditText inputPassword = findViewById(R.id.editTextPassword);
-        inputPassword.setOnFocusChangeListener(this::onFocusChange);
+        binding.editTextPassword.setOnFocusChangeListener(this::onFocusChange);
 
-
-        MaterialButton btnLogin = findViewById(R.id.buttonLogin);
-        btnLogin.setOnClickListener(v -> {
+        binding.buttonLogin.setOnClickListener(v -> {
             setResult(RESULT_OK);
             finish();
         });
@@ -47,5 +43,11 @@ public class LoginActivity extends AppCompatActivity {
         if (!hasFocus) {
             hideKeyboard(v);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        binding = null;
     }
 }

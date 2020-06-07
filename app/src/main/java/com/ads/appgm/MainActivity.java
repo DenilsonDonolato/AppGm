@@ -8,23 +8,20 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.ads.appgm.clickListeners.ButtonPanic;
+import com.ads.appgm.databinding.ActivityMainBinding;
 import com.ads.appgm.dialog.PermissionDialog;
 import com.ads.appgm.manager.PanicManager;
-import com.ads.appgm.manager.PaniqueManager;
 import com.ads.appgm.manager.PaniqueManagerListener;
 import com.ads.appgm.manager.device.output.OutputDeviceListener;
 import com.ads.appgm.service.PaniqueQuick;
 import com.ads.appgm.util.SettingsUtils;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.switchmaterial.SwitchMaterial;
 
 
 public class MainActivity extends AppCompatActivity implements PaniqueManagerListener {
-    private MaterialButton panicButton;
-    private SwitchMaterial panicFunction;
+
+    private ActivityMainBinding binding;
 
     private TransitionDrawable transAnimButFlash;
 
@@ -34,16 +31,15 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar myToolbar = findViewById(R.id.my_toolbar);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        panicFunction = findViewById(R.id.panic_function);
-        panicButton =  findViewById(R.id.buttonPanic);
+        binding.panicFunction.setOnClickListener(this::openAccessibilitySettings);
 
         //transAnimButFlash = (TransitionDrawable) panicButton.getBackground();
         //transAnimButFlash.resetTransition();
 
-        setSupportActionBar(myToolbar);
+        setSupportActionBar(binding.toolbar.getRoot());
     }
 
     @Override
@@ -64,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
                 this.setPanicButtonStatus(this.isPanicOn());
             }
         }
-        panicFunction.setChecked(isPaniqueQuickServiceRunning());
+        binding.panicFunction.setChecked(isPaniqueQuickServiceRunning());
     }
 
     @Override
@@ -88,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     }
 
     public void openAccessibilitySettings(View v) {
-        if (panicFunction.isChecked()) {
+        if (binding.panicFunction.isChecked()) {
             Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
             startActivity(intent);
         } else {
