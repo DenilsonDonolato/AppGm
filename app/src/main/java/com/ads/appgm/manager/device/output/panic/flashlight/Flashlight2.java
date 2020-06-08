@@ -2,12 +2,14 @@ package com.ads.appgm.manager.device.output.panic.flashlight;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Looper;
 import android.widget.Toast;
 
@@ -71,6 +73,12 @@ public class Flashlight2 extends Flashlight {
     }
 
     private void panic() {
+        LocationManager lm = (LocationManager) context.getSystemService(Activity.LOCATION_SERVICE);
+        if (lm == null || !lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Notification notification = new Notification(context);
+            notification.show("GPS Desligado", "Ligar o GPS para o funcionamento correto do App", 1);
+            return;
+        }
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             //TODO ask permission?
