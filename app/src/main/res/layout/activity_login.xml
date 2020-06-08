@@ -71,7 +71,7 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/buttonLogin"
         style="@style/MyButtonTheme"
-        android:layout_width="wrap_content"
+        android:layout_width="130dp"
         android:layout_height="wrap_content"
         android:text="@string/button_login"
         app:layout_constraintBottom_toBottomOf="parent"

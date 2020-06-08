@@ -28,7 +28,7 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/buttonPanic"
         style="@style/MyButtonTheme"
-        android:layout_width="wrap_content"
+        android:layout_width="130dp"
         android:layout_height="wrap_content"
         android:text="@string/button_panic"
         app:layout_constraintBottom_toTopOf="@+id/panic_function"
