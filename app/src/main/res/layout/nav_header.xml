@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="160dp"
+    android:gravity="bottom"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/nav_header_imageView"
+        android:layout_width="84dp"
+        android:layout_height="84dp"
+        android:layout_marginStart="36dp"
+        android:contentDescription="SOS Maria"
+        android:src="@drawable/gender" />
+
+</LinearLayout>

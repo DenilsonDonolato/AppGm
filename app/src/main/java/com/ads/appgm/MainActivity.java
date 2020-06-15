@@ -10,7 +10,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 
 import com.ads.appgm.clickListeners.ButtonPanic;
 import com.ads.appgm.databinding.ActivityMainBinding;
@@ -22,9 +24,10 @@ import com.ads.appgm.service.PaniqueQuick;
 import com.ads.appgm.util.SettingsUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.material.navigation.NavigationView;
 
 
-public class MainActivity extends AppCompatActivity implements PaniqueManagerListener {
+public class MainActivity extends AppCompatActivity implements PaniqueManagerListener, NavigationView.OnNavigationItemSelectedListener {
 
     private ActivityMainBinding binding;
     public static MainActivity instance;
@@ -49,6 +52,12 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         //transAnimButFlash.resetTransition();
 
         setSupportActionBar(binding.toolbar.getRoot());
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.getRoot(), binding.toolbar.getRoot(),
+                R.string.open_drawer,R.string.close_drawer);
+        binding.getRoot().addDrawerListener(toggle);
+        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.textColor));
+        toggle.syncState();
+        binding.navView.setNavigationItemSelectedListener(this);
     }
 
     @Override
@@ -162,5 +171,29 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.nav_recordings:
+                Toast.makeText(this,"Clicou no Gravações",Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.nav_settings:
+                Toast.makeText(this,"Clicou no Configurações",Toast.LENGTH_SHORT).show();
+                break;
+        }
+        binding.getRoot().closeDrawer(GravityCompat.START);
+
+        return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (binding.getRoot().isDrawerOpen(GravityCompat.START)) {
+            binding.getRoot().closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 }

@@ -35,4 +35,9 @@
     <string name="turn_on_gps">Ativar GPS</string>
     <string name="reason_gps">Para sua segurança este aplicativo precisa de permissão de localização o tempo todo.</string>
     <string name="allow_gps">Permitir GPS</string>
+    <string name="help">Ajuda</string>
+    <string name="settings">Configuração</string>
+    <string name="records">Gravações</string>
+    <string name="open_drawer">Abrir</string>
+    <string name="close_drawer">Fechar</string>
 </resources>
