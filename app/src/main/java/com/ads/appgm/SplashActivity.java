@@ -31,7 +31,7 @@ public class SplashActivity extends AppCompatActivity {
         //TODO validacao de Login
         validLogin = false;
         lm = (LocationManager) getSystemService(Activity.LOCATION_SERVICE);
-        Notification notification = new Notification(this);
+        Notification notification = new Notification(getApplicationContext());
         notification.createNotificationChannel();
     }
 
@@ -39,9 +39,9 @@ public class SplashActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        if (ContextCompat.checkSelfPermission(this,
+        if (ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this,
+                ContextCompat.checkSelfPermission(getApplicationContext(),
                         Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // You can use the API that requires the permission.
             startApp();
@@ -80,7 +80,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void showTurnOnGps() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
         builder.setTitle(R.string.GPS).setMessage(R.string.reason_gps)
                 .setNegativeButton(R.string.close, listenerGpsOn)
                 .setCancelable(false)
@@ -138,6 +138,7 @@ public class SplashActivity extends AppCompatActivity {
                     for (int grantResult : grantResults) {
                         if (grantResult != PackageManager.PERMISSION_GRANTED) {
                             allPermissions = false;
+                            break;
                         }
                     }
                     if (allPermissions) {
@@ -160,7 +161,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void showGPSDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
         builder.setTitle(R.string.GPS).setMessage(R.string.reason_location)
                 .setNegativeButton(R.string.close, listenerLocationPermission)
                 .setCancelable(false)
