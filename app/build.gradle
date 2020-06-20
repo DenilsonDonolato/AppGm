@@ -37,6 +37,13 @@ android {
 
 }
 
+sourceSets{
+    test{}
+}
+configurations {
+    testImplementation.extendsFrom implementation
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
