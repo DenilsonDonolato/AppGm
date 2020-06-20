@@ -1,5 +1,7 @@
 package com.ads.appgm.service;
 
+import com.ads.appgm.BuildConfig;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -8,7 +10,7 @@ public class HttpClient {
 
     private static OkHttpClient instance;
 
-    public final static String BASE_URL = "https://ngrok.aoifhoaihgoeir23040230.com";
+    public final static String BASE_URL = BuildConfig.BASE_URL;
     public final static String APPLICATION_JSON = "application/json; chaset=utf-8";
 
     public static OkHttpClient getInstance() {

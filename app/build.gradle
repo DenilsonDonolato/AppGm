@@ -18,6 +18,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "BASE_URL", "\"https://url.back-end.com\"")
+        }
+        debug {
+            buildConfigField("String", "BASE_URL", "\"https://92fe9ac6.ngrok.io\"")
         }
     }
 
@@ -37,8 +41,8 @@ android {
 
 }
 
-sourceSets{
-    test{}
+sourceSets {
+    test {}
 }
 configurations {
     testImplementation.extendsFrom implementation
