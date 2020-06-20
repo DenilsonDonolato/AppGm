@@ -46,7 +46,7 @@ public class MockApi {
         }
     }
 
-    public static void restApi(){
+    public static void resetApi(){
         dispatcher.resetControllersToDefault();
     }
 

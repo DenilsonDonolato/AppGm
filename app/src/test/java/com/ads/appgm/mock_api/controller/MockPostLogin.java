@@ -2,6 +2,7 @@ package com.ads.appgm.mock_api.controller;
 
 
 
+import com.ads.appgm.mock_api.MockApiHelper;
 import com.ads.appgm.mock_api.model.MockLogin;
 import com.ads.appgm.mock_api.model.MockLoginRequest;
 
@@ -40,7 +41,6 @@ public class MockPostLogin extends MockApiController {
     public MockResponse response(RecordedRequest request) {
         final String body = request.getBody().clone().readUtf8();
         final MockLoginRequest loginRequest = MockApiHelper.fromJson(body, MockLoginRequest.class);
-
         if (loginRequest == null) {
             return new MockResponse().setResponseCode(400).setBody("Payload inválido: " + request.getBody().clone().readUtf8());
         }

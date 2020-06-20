@@ -1,4 +1,4 @@
-package com.ads.appgm.mock_api.controller;
+package com.ads.appgm.mock_api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
