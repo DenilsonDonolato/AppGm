@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat;
 
 import com.ads.appgm.notification.Notification;
 import com.ads.appgm.util.Constants;
+import com.ads.appgm.util.SharedPreferenceUtil;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -33,6 +34,7 @@ public class SplashActivity extends AppCompatActivity {
         lm = (LocationManager) getSystemService(Activity.LOCATION_SERVICE);
         Notification notification = new Notification(getApplicationContext());
         notification.createNotificationChannel();
+        new SharedPreferenceUtil(getApplicationContext());
     }
 
     @Override
@@ -80,7 +82,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void showTurnOnGps() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.GPS).setMessage(R.string.reason_gps)
                 .setNegativeButton(R.string.close, listenerGpsOn)
                 .setCancelable(false)
@@ -161,7 +163,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void showGPSDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.GPS).setMessage(R.string.reason_location)
                 .setNegativeButton(R.string.close, listenerLocationPermission)
                 .setCancelable(false)

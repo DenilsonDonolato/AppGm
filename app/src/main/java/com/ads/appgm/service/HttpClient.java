@@ -1,6 +1,12 @@
 package com.ads.appgm.service;
 
+import android.content.SharedPreferences;
+
 import com.ads.appgm.BuildConfig;
+import com.ads.appgm.util.Constants;
+import com.ads.appgm.util.SharedPreferenceUtil;
+
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -11,6 +17,7 @@ public class HttpClient {
     private static OkHttpClient instance;
 
     public final static String BASE_URL = BuildConfig.BASE_URL;
+    public final static String LOGIN_URL = BASE_URL + "/login";
     public final static String APPLICATION_JSON = "application/json; chaset=utf-8";
 
     public static OkHttpClient getInstance() {
@@ -22,10 +29,22 @@ public class HttpClient {
         return instance;
     }
 
+    public static OkHttpClient getLoginClient() {
+        return new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build();
+    }
+
     private static OkHttpClient buildHttpClient() {
-        String token ="";
+        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        String token = sp.getString(Constants.USER_TOKEN,"no_token");
 
         return new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
                 .addInterceptor(chain -> {
                     Request request = chain.request();
 

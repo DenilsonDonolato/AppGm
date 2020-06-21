@@ -27,6 +27,11 @@ public class Constants {
     public static final int LOGIN_INTENT_REQUEST = 1;
     public static final int GPS_PERMISSION_REQUEST = 2;
     public static final int GPS_TURN_ON = 3;
+    public static final String SHARED_PREFERENCES = "com.ads.appgm.appgm_preferences";
+    public static final String USER_TOKEN = "API_TOKEN";
+    public static final String USER_ID = "USER_ID";
+    public static final String USER_NAME = "USER_NAME";
+
 
 
     public final static String ID_DEVICE_OUTPUT = "1";

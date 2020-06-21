@@ -21,7 +21,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://url.back-end.com\"")
         }
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://6142276b3918.ngrok.io\"")
+            buildConfigField("String", "BASE_URL", "\"https://9989d18a2eb5.ngrok.io\"")
         }
     }
 
@@ -41,13 +41,6 @@ android {
 
 }
 
-sourceSets {
-    test {}
-}
-configurations {
-    testImplementation.extendsFrom implementation
-}
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -59,13 +52,11 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
     implementation 'com.squareup.okhttp3:okhttp:4.7.2'
-    testImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72"
-    testImplementation 'com.squareup.okhttp3:mockwebserver:4.7.2'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.11.0'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.0'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.0'
+    testImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
 }
