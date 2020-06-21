@@ -11,25 +11,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.ads.appgm.databinding.ActivityLoginBinding;
 import com.ads.appgm.model.Login;
 import com.ads.appgm.model.LoginResponse;
+import com.ads.appgm.service.BackEndService;
 import com.ads.appgm.service.HttpClient;
 import com.ads.appgm.util.Animations;
 import com.ads.appgm.util.Constants;
 import com.ads.appgm.util.MaskEditUtil;
 import com.ads.appgm.util.SharedPreferenceUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -50,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
 
         binding.buttonLogin.setOnClickListener(v -> {
             hideKeyboard(v);
-            Animations.animateView(binding.loginProgress.getRoot(),View.VISIBLE,0.5f,250);
+            Animations.animateView(binding.loginProgress.getRoot(), View.VISIBLE, 0.5f, 250);
             enviarReqLogin();
         });
     }
@@ -61,32 +52,18 @@ public class LoginActivity extends AppCompatActivity {
                 binding.editTextPassword.getText() == null ||
                 binding.editTextCPF.getText().toString().isEmpty() ||
                 binding.editTextPassword.getText().toString().isEmpty()) {
+            Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 100);
             Toast.makeText(getApplicationContext(), "Favor preencher CPF e senha", Toast.LENGTH_LONG).show();
             return;
         }
-
-        OkHttpClient client = HttpClient.getLoginClient();
+        BackEndService client = HttpClient.getInstance();
         Login login = new Login(
                 binding.editTextCPF.getText().toString(),
                 binding.editTextPassword.getText().toString()
         );
 
-        String json = "";
-        try {
-            json = new ObjectMapper().writeValueAsString(login);
-        } catch (JsonProcessingException e) {
-            Toast.makeText(getApplicationContext(),"Erro ao ler CPF e senha",Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        RequestBody body = RequestBody.create(json, MediaType.parse(HttpClient.APPLICATION_JSON));
-        Request request = new Request.Builder()
-                .url(HttpClient.LOGIN_URL)
-                .post(body)
-                .build();
-
-        client.newCall(request).enqueue(loginCallback);
-
+        Call<LoginResponse> loginResponse = client.loginRequest(login);
+        loginResponse.enqueue(loginResponseCallback);
     }
 
     public void hideKeyboard(View view) {
@@ -108,39 +85,54 @@ public class LoginActivity extends AppCompatActivity {
         binding = null;
     }
 
-    Callback loginCallback = new Callback() {
+    Callback<LoginResponse> loginResponseCallback = new Callback<LoginResponse>() {
         @Override
-        public void onFailure(@NotNull Call call, @NotNull IOException e) {
-            if (!call.isCanceled()) {
-                call.cancel();
-            }
-            runOnUiThread(() -> {
-                Animations.animateView(binding.loginProgress.getRoot(),View.GONE,0f,100);
-                Toast.makeText(getApplicationContext(), "Erro de rede: "+e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-            });
-        }
-
-        @Override
-        public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+        public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
             if (!call.isCanceled()) {
                 call.cancel();
             }
             if (!response.isSuccessful()) {
                 runOnUiThread(() -> {
-                    Toast.makeText(getApplicationContext(), "Erro de Autenticação", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Erro de Servidor", Toast.LENGTH_LONG).show();
                 });
-                Animations.animateView(binding.loginProgress.getRoot(),View.GONE,0f,150);
+                Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 150);
                 return;
             }
-            LoginResponse loginResponse = new ObjectMapper().readValue(response.body().string(), LoginResponse.class);
+
+            LoginResponse loginResponse = response.body();
+            if (loginResponse == null) {
+                runOnUiThread(() -> {
+                    runOnUiThread(() -> {
+                        Toast.makeText(getApplicationContext(), "Erro de Cadastro", Toast.LENGTH_LONG).show();
+                    });
+                    Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 150);
+                });
+                return;
+            }
             SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
             sp.edit().putString(Constants.USER_TOKEN, loginResponse.getToken())
                     .putLong(Constants.USER_ID, loginResponse.getId())
                     .putString(Constants.USER_NAME, loginResponse.getNome())
                     .apply();
             setResult(RESULT_OK);
-            Animations.animateView(binding.loginProgress.getRoot(),View.GONE,0f,150);
+            Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 150);
             finish();
+
+        }
+
+        @Override
+        public void onFailure(Call<LoginResponse> call, Throwable t) {
+            if (!call.isCanceled()) {
+                call.cancel();
+            }
+            runOnUiThread(() -> {
+                Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 100);
+                if (call.isExecuted()) {
+                    Toast.makeText(getApplicationContext(), "Tempo expirado", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Erro de rede", Toast.LENGTH_LONG).show();
+                }
+            });
         }
     };
 }
