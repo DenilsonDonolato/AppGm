@@ -18,11 +18,25 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "BASE_URL", "\"https://url.back-end.com/\"")
+        }
+        debug {
+            buildConfigField("String", "BASE_URL", "\"https://b705eb9b1ad1.ngrok.io \"")
         }
     }
+
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
+    }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
 }
@@ -34,8 +48,17 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.media:media:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    testImplementation 'junit:junit:4.12'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.7.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.11.0'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
+    testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
 }

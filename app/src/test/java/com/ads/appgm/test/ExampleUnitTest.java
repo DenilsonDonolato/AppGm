@@ -1,4 +1,4 @@
-package com.ads.appgm;
+package com.ads.appgm.test;
 
 import org.junit.Test;
 

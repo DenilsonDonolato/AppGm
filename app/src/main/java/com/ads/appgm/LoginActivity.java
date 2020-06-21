@@ -1,43 +1,73 @@
 package com.ads.appgm;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
+import com.ads.appgm.databinding.ActivityLoginBinding;
+import com.ads.appgm.model.Login;
+import com.ads.appgm.model.LoginResponse;
+import com.ads.appgm.service.BackEndService;
+import com.ads.appgm.service.HttpClient;
+import com.ads.appgm.util.Animations;
+import com.ads.appgm.util.Constants;
 import com.ads.appgm.util.MaskEditUtil;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
+import com.ads.appgm.util.SharedPreferenceUtil;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
+
+    private ActivityLoginBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        Toolbar myToolbar = findViewById(R.id.my_toolbar);
-        setSupportActionBar(myToolbar);
+        setSupportActionBar(binding.toolbar.getRoot());
 
-        TextInputEditText inputCPF = findViewById(R.id.editTextCPF);
-        inputCPF.addTextChangedListener(MaskEditUtil.mask(inputCPF,MaskEditUtil.FORMAT_CPF));
-        inputCPF.setOnFocusChangeListener(this::onFocusChange);
+        binding.editTextCPF.addTextChangedListener(MaskEditUtil.mask(binding.editTextCPF, MaskEditUtil.FORMAT_CPF));
+        binding.editTextCPF.setOnFocusChangeListener(this::onFocusChange);
 
-        TextInputEditText inputPassword = findViewById(R.id.editTextPassword);
-        inputPassword.setOnFocusChangeListener(this::onFocusChange);
+        binding.editTextPassword.setOnFocusChangeListener(this::onFocusChange);
 
-
-        MaterialButton btnLogin = findViewById(R.id.buttonLogin);
-        btnLogin.setOnClickListener(v -> {
-            setResult(RESULT_OK);
-            finish();
+        binding.buttonLogin.setOnClickListener(v -> {
+            hideKeyboard(v);
+            Animations.animateView(binding.loginProgress.getRoot(), View.VISIBLE, 0.5f, 250);
+            enviarReqLogin();
         });
     }
 
+    private void enviarReqLogin() {
+
+        if (binding.editTextCPF.getText() == null ||
+                binding.editTextPassword.getText() == null ||
+                binding.editTextCPF.getText().toString().isEmpty() ||
+                binding.editTextPassword.getText().toString().isEmpty()) {
+            Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 100);
+            Toast.makeText(getApplicationContext(), "Favor preencher CPF e senha", Toast.LENGTH_LONG).show();
+            return;
+        }
+        BackEndService client = HttpClient.getInstance();
+        Login login = new Login(
+                binding.editTextCPF.getText().toString(),
+                binding.editTextPassword.getText().toString()
+        );
+
+        Call<LoginResponse> loginResponse = client.loginRequest(login);
+        loginResponse.enqueue(loginResponseCallback);
+    }
+
     public void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE);
         if (inputMethodManager != null) {
             inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
@@ -48,4 +78,61 @@ public class LoginActivity extends AppCompatActivity {
             hideKeyboard(v);
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        binding = null;
+    }
+
+    Callback<LoginResponse> loginResponseCallback = new Callback<LoginResponse>() {
+        @Override
+        public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+            if (!call.isCanceled()) {
+                call.cancel();
+            }
+            if (!response.isSuccessful()) {
+                runOnUiThread(() -> {
+                    Toast.makeText(getApplicationContext(), "Erro de Servidor", Toast.LENGTH_LONG).show();
+                });
+                Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 150);
+                return;
+            }
+
+            LoginResponse loginResponse = response.body();
+            if (loginResponse == null) {
+                runOnUiThread(() -> {
+                    runOnUiThread(() -> {
+                        Toast.makeText(getApplicationContext(), "Erro de Cadastro", Toast.LENGTH_LONG).show();
+                    });
+                    Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 150);
+                });
+                return;
+            }
+            SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+            sp.edit().putString(Constants.USER_TOKEN, loginResponse.getToken())
+                    .putLong(Constants.USER_ID, loginResponse.getId())
+                    .putString(Constants.USER_NAME, loginResponse.getNome())
+                    .apply();
+            setResult(RESULT_OK);
+            Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 150);
+            finish();
+
+        }
+
+        @Override
+        public void onFailure(Call<LoginResponse> call, Throwable t) {
+            if (!call.isCanceled()) {
+                call.cancel();
+            }
+            runOnUiThread(() -> {
+                Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 100);
+                if (call.isExecuted()) {
+                    Toast.makeText(getApplicationContext(), "Tempo expirado", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Erro de rede", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    };
 }

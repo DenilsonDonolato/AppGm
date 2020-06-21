@@ -33,10 +33,6 @@
         <item name="boxStrokeWidthFocused">0dp</item>
     </style>
 
-    <style name="MyButtonTheme" parent="Widget.MaterialComponents.Button">
-        <item name="materialThemeOverlay">@style/ButtonStyleTextColor</item>
-    </style>
-
     <style name="ButtonStyleTextColor">
         <item name="colorOnPrimary">@color/textColor</item>
         <item name="colorOnSecondary">@color/textColor</item>

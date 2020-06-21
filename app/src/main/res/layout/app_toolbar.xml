@@ -6,8 +6,8 @@
     android:layout_height="?attr/actionBarSize"
     android:background="?attr/colorPrimary"
     android:elevation="4dp"
-    app:titleTextColor="@color/textColor"
     android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
-    app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light">
+    app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+    app:titleTextColor="@color/textColor">
 
 </com.google.android.material.appbar.MaterialToolbar>

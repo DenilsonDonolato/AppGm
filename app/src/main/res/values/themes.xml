@@ -32,6 +32,11 @@
         <item name="boxStrokeWidthFocused">0dp</item>
     </style>
 
+    <style name="MyButtonTheme" parent="Widget.MaterialComponents.Button">
+        <item name="cornerRadius">20dp</item>
+        <item name="materialThemeOverlay">@style/ButtonStyleTextColor</item>
+    </style>
+
     <style name="textOnScreen" parent="AppTheme.Base">
         <item name="android:textColor">@color/textColorOnLight</item>
     </style>
