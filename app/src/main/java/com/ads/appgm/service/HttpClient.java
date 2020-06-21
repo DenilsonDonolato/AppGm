@@ -28,8 +28,6 @@ public class HttpClient {
     }
 
     private static BackEndService buildHttpClient() {
-        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
-        String token = sp.getString(Constants.USER_TOKEN,"no_token");
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)

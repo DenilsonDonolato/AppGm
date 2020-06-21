@@ -47,7 +47,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void enviarReqLogin() {
-
         if (binding.editTextCPF.getText() == null ||
                 binding.editTextPassword.getText() == null ||
                 binding.editTextCPF.getText().toString().isEmpty() ||
@@ -93,12 +92,15 @@ public class LoginActivity extends AppCompatActivity {
             }
             if (!response.isSuccessful()) {
                 runOnUiThread(() -> {
-                    Toast.makeText(getApplicationContext(), "Erro de Servidor", Toast.LENGTH_LONG).show();
+                    if (response.code() == 401) {
+                        Toast.makeText(getApplicationContext(), "Erro de Autenticação", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Erro de Servidor", Toast.LENGTH_LONG).show();
+                    }
                 });
                 Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 150);
                 return;
             }
-
             LoginResponse loginResponse = response.body();
             if (loginResponse == null) {
                 runOnUiThread(() -> {
@@ -113,11 +115,11 @@ public class LoginActivity extends AppCompatActivity {
             sp.edit().putString(Constants.USER_TOKEN, loginResponse.getToken())
                     .putLong(Constants.USER_ID, loginResponse.getId())
                     .putString(Constants.USER_NAME, loginResponse.getNome())
+                    .putString(Constants.EXPIRATION_DATE, loginResponse.getValidade())
                     .apply();
             setResult(RESULT_OK);
             Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 150);
             finish();
-
         }
 
         @Override

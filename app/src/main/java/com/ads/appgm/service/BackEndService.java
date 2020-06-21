@@ -6,6 +6,7 @@ import com.ads.appgm.model.LoginResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 
 public interface BackEndService {
@@ -14,5 +15,5 @@ public interface BackEndService {
     Call<LoginResponse> loginRequest(@Body Login login);
 
 //    @POST("location")
-//    Call<String> postLocation(@Body Location location);
+//    Call<String> postLocation(@Body Location location, @Header("Authorization") String token);
 }

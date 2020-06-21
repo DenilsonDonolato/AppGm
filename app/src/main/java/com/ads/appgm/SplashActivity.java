@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Build;
@@ -19,22 +20,28 @@ import androidx.core.content.ContextCompat;
 
 import com.ads.appgm.notification.Notification;
 import com.ads.appgm.util.Constants;
+import com.ads.appgm.util.MyTimestamp;
 import com.ads.appgm.util.SharedPreferenceUtil;
+
+import java.util.Calendar;
 
 public class SplashActivity extends AppCompatActivity {
 
-    boolean validLogin;
+    private boolean validLogin;
     private LocationManager lm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //TODO validacao de Login
-        validLogin = false;
         lm = (LocationManager) getSystemService(Activity.LOCATION_SERVICE);
         Notification notification = new Notification(getApplicationContext());
         notification.createNotificationChannel();
         new SharedPreferenceUtil(getApplicationContext());
+        Calendar now = Calendar.getInstance();
+        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        String expiration = sp.getString(Constants.EXPIRATION_DATE, MyTimestamp.IsofromCalendar(now));
+//        Calendar expirationDate = MyTimestamp.
+        validLogin = false;
     }
 
     @Override

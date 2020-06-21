@@ -30,9 +30,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/buttonPanic"
-            style="@style/MyButtonTheme"
             android:layout_width="130dp"
             android:layout_height="wrap_content"
             android:text="@string/button_panic"
