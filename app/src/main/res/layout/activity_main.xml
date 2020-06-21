@@ -30,12 +30,11 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <com.google.android.material.button.MaterialButton
+        <android.widget.Button
             android:id="@+id/buttonPanic"
-            style="@style/MyButtonTheme"
-            android:layout_width="130dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/button_panic"
+            android:background="@drawable/custom_button"
             app:layout_constraintBottom_toTopOf="@+id/panic_function"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

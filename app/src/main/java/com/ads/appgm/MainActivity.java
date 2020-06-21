@@ -1,6 +1,7 @@
 package com.ads.appgm;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.view.Menu;
@@ -22,6 +23,8 @@ import com.ads.appgm.manager.PaniqueManagerListener;
 import com.ads.appgm.manager.device.output.OutputDeviceListener;
 import com.ads.appgm.service.PaniqueQuick;
 import com.ads.appgm.util.SettingsUtils;
+import com.ads.appgm.util.SharedPreferenceUtil;
+import com.google.android.gms.common.util.SharedPreferencesUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.navigation.NavigationView;
@@ -58,14 +61,27 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.textColor));
         toggle.syncState();
         binding.navView.setNavigationItemSelectedListener(this);
+
+
     }
 
     @Override
     protected void onStart() {
-        Button panic = findViewById(R.id.buttonPanic);
-
-        panic.setOnClickListener(new ButtonPanic(fusedLocationProviderClient, this));
-
+//        binding.buttonPanic.setOnClickListener(new ButtonPanic(fusedLocationProviderClient, this));
+          binding.buttonPanic.setOnClickListener(new View.OnClickListener() {
+              @Override
+              public void onClick(View v) {
+                  SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+                  boolean isActive = sp.getBoolean("panicActive", false);
+                  if (isActive){
+                      sp.edit().putBoolean("panicActive", false).apply();
+                      binding.buttonPanic.setBackground(getDrawable(R.drawable.button_disabled));
+                  }else{
+                      sp.edit().putBoolean("panicActive", true).apply();
+                      binding.buttonPanic.setBackground(getDrawable(R.drawable.button_default));
+                  }
+              }
+          });
         super.onStart();
     }
 
