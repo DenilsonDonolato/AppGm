@@ -25,6 +25,7 @@ import com.ads.appgm.service.PaniqueQuick;
 import com.ads.appgm.util.SettingsUtils;
 import com.ads.appgm.util.SharedPreferenceUtil;
 import com.google.android.gms.common.util.SharedPreferencesUtils;
+import com.google.android.gms.dynamic.IFragmentWrapper;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.navigation.NavigationView;
@@ -62,26 +63,19 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         toggle.syncState();
         binding.navView.setNavigationItemSelectedListener(this);
 
-
+        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        boolean isActive = sp.getBoolean("panicActive", false);
+        if (isActive){
+            binding.buttonPanic.setBackground(getDrawable(R.drawable.custom_button_active));
+        }else{
+            binding.buttonPanic.setBackground(getDrawable(R.drawable.custom_button_inactive));
+        }
     }
 
     @Override
     protected void onStart() {
-//        binding.buttonPanic.setOnClickListener(new ButtonPanic(fusedLocationProviderClient, this));
-          binding.buttonPanic.setOnClickListener(new View.OnClickListener() {
-              @Override
-              public void onClick(View v) {
-                  SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
-                  boolean isActive = sp.getBoolean("panicActive", false);
-                  if (isActive){
-                      sp.edit().putBoolean("panicActive", false).apply();
-                      binding.buttonPanic.setBackground(getDrawable(R.drawable.button_disabled));
-                  }else{
-                      sp.edit().putBoolean("panicActive", true).apply();
-                      binding.buttonPanic.setBackground(getDrawable(R.drawable.button_default));
-                  }
-              }
-          });
+        binding.buttonPanic.setOnClickListener(new ButtonPanic(fusedLocationProviderClient, this));
+
         super.onStart();
     }
 
