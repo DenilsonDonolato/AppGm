@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Looper;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
@@ -39,11 +40,9 @@ public class ButtonPanic implements View.OnClickListener {
         if (isActive){
             sp.edit().putBoolean("panicActive", false).apply();
             v.setBackground(activity.getDrawable(R.drawable.custom_button_inactive));
-
         }else{
             sp.edit().putBoolean("panicActive", true).apply();
             v.setBackground(activity.getDrawable(R.drawable.custom_button_active));
-
             if (ActivityCompat.checkSelfPermission(v.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                     ActivityCompat.checkSelfPermission(v.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
