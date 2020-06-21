@@ -1,8 +1,11 @@
 package com.ads.appgm;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +24,9 @@ import com.ads.appgm.manager.PanicManager;
 import com.ads.appgm.manager.PaniqueManagerListener;
 import com.ads.appgm.manager.device.output.OutputDeviceListener;
 import com.ads.appgm.service.PaniqueQuick;
+import com.ads.appgm.util.Constants;
 import com.ads.appgm.util.SettingsUtils;
+import com.ads.appgm.util.SharedPreferenceUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.navigation.NavigationView;
@@ -44,6 +49,27 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        PowerManager powerManager = (PowerManager)getSystemService(Context.POWER_SERVICE);
+        if (powerManager != null) {
+            boolean powerSaveMode = powerManager.isPowerSaveMode();
+            View logo = binding.navView.getHeaderView(0);
+            binding.navView.removeHeaderView(logo);
+            if (powerSaveMode){
+                binding.navView.inflateHeaderView(R.layout.nav_header_dark);
+            } else {
+                binding.navView.inflateHeaderView(R.layout.nav_header);
+            }
+        }
+
+        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        String message = "Olá";
+        String nome = sp.getString(Constants.USER_NAME, null);
+        if (nome != null) {
+            message += ", " + nome + "!";
+        } else {
+            message += "!";
+        }
+        binding.textViewName.setText(message);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         binding.panicFunction.setOnClickListener(this::openAccessibilitySettings);

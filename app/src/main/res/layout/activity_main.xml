@@ -30,15 +30,28 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
+        <TextView
+            android:id="@+id/textViewName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/textColorOnLight"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/buttonPanic"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
         <Button
             android:id="@+id/buttonPanic"
             android:layout_width="130dp"
             android:layout_height="wrap_content"
             android:text="@string/button_panic"
-            app:layout_constraintBottom_toTopOf="@+id/panic_function"
+            app:layout_constraintBottom_toTopOf="@id/panic_function"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+            app:layout_constraintTop_toBottomOf="@id/textViewName" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

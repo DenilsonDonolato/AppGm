@@ -39,7 +39,7 @@ public class SplashActivity extends AppCompatActivity {
         new SharedPreferenceUtil(getApplicationContext());
         Calendar now = Calendar.getInstance();
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
-        String expiration = sp.getString(Constants.EXPIRATION_DATE, MyTimestamp.IsofromCalendar(now));
+//        String expiration = sp.getString(Constants.EXPIRATION_DATE, MyTimestamp.IsofromCalendar(now));
 //        Calendar expirationDate = MyTimestamp.
         validLogin = false;
     }

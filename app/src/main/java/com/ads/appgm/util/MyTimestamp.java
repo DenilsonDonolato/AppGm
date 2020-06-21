@@ -37,9 +37,9 @@ public class MyTimestamp {
         return shortSdt.format(dateFormat);
     }
 
-    public static Calendar stringToDate(String dateString) throws ParseException {
-        SimpleDateFormat timestamp = new SimpleDateFormat(MyTimestamp.timestamp,Locale.getDefault());
-        Calendar calendar = new Calendar.Builder().
-        return timestamp.parse(dateString);
-    }
+//    public static Calendar stringToDate(String dateString) throws ParseException {
+//        SimpleDateFormat timestamp = new SimpleDateFormat(MyTimestamp.timestamp,Locale.getDefault());
+//        Calendar calendar = new Calendar.Builder().
+//        return timestamp.parse(dateString);
+//    }
 }
