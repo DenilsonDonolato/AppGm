@@ -84,13 +84,18 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.textColor));
         toggle.syncState();
         binding.navView.setNavigationItemSelectedListener(this);
+
+        boolean isActive = sp.getBoolean("panicActive", false);
+        if (isActive){
+            binding.buttonPanic.setBackground(getDrawable(R.drawable.custom_button_active));
+        }else{
+            binding.buttonPanic.setBackground(getDrawable(R.drawable.custom_button_inactive));
+        }
     }
 
     @Override
     protected void onStart() {
-        Button panic = findViewById(R.id.buttonPanic);
-
-        panic.setOnClickListener(new ButtonPanic(fusedLocationProviderClient, this));
+        binding.buttonPanic.setOnClickListener(new ButtonPanic(fusedLocationProviderClient, this));
 
         super.onStart();
     }

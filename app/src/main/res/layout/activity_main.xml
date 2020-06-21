@@ -42,12 +42,12 @@
             app:layout_constraintBottom_toTopOf="@id/buttonPanic"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
-        <Button
+        <android.widget.Button
             android:id="@+id/buttonPanic"
-            android:layout_width="130dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/button_panic"
-            app:layout_constraintBottom_toTopOf="@id/panic_function"
+            android:background="@drawable/custom_button_inactive"
+            app:layout_constraintBottom_toTopOf="@+id/panic_function"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textViewName" />
