@@ -86,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     private void setAppTheme() {
         int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        View logo = binding.navView.getHeaderView(0);
+        binding.navView.removeHeaderView(logo);
         switch (currentNightMode) {
             case Configuration.UI_MODE_NIGHT_NO:
                 // Night mode is not active, we're using the light theme
@@ -216,7 +218,8 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
                 Toast.makeText(this,"Clicou no Gravações",Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_settings:
-                Toast.makeText(this,"Clicou no Configurações",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
+                startActivity(intent);
                 break;
         }
         binding.getRoot().closeDrawer(GravityCompat.START);
