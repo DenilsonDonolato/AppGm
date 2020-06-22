@@ -17,6 +17,7 @@
         <activity
             android:name=".SettingsActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/textOnScreen"
             android:label="@string/title_activity_settings"/>
         <activity
             android:name=".LoginActivity"

@@ -41,20 +41,16 @@
     <string name="open_drawer">Abrir</string>
     <string name="close_drawer">Fechar</string>
     <string name="about">Sobre</string>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_settings">Configurações</string>
 
     <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
+    <string name="sync_header">Função Pânico Rápido</string>
 
     <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
     <string name="reply_title">Default reply action</string>
 
     <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="panic_quick">Função de Pânico</string>
+    <string name="panic_quick_on">Pânico Rápido ativado, use os botões de volume para ativar o pânico</string>
+    <string name="panic_quick_off">Ative a função de Pânico rápido para ativar o pânico usando os botões de volume</string>
 </resources>
