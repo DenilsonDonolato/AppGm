@@ -63,6 +63,7 @@ public class LoginActivity extends AppCompatActivity {
 
         Call<LoginResponse> loginResponse = client.loginRequest(login);
         loginResponse.enqueue(loginResponseCallback);
+
     }
 
     public void hideKeyboard(View view) {
