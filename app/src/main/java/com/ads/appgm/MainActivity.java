@@ -3,6 +3,7 @@ package com.ads.appgm;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -49,17 +50,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        PowerManager powerManager = (PowerManager)getSystemService(Context.POWER_SERVICE);
-        if (powerManager != null) {
-            boolean powerSaveMode = powerManager.isPowerSaveMode();
-            View logo = binding.navView.getHeaderView(0);
-            binding.navView.removeHeaderView(logo);
-            if (powerSaveMode){
-                binding.navView.inflateHeaderView(R.layout.nav_header_dark);
-            } else {
-                binding.navView.inflateHeaderView(R.layout.nav_header);
-            }
-        }
+        setAppTheme();
 
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
         String message = "Olá";
@@ -90,6 +81,20 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
             binding.buttonPanic.setBackground(getDrawable(R.drawable.custom_button_active));
         }else{
             binding.buttonPanic.setBackground(getDrawable(R.drawable.custom_button_inactive));
+        }
+    }
+
+    private void setAppTheme() {
+        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        switch (currentNightMode) {
+            case Configuration.UI_MODE_NIGHT_NO:
+                // Night mode is not active, we're using the light theme
+                binding.navView.inflateHeaderView(R.layout.nav_header);
+                break;
+            case Configuration.UI_MODE_NIGHT_YES:
+                // Night mode is active, we're using dark theme
+                binding.navView.inflateHeaderView(R.layout.nav_header_dark);
+                break;
         }
     }
 
