@@ -20,7 +20,6 @@ import androidx.core.content.ContextCompat;
 
 import com.ads.appgm.notification.Notification;
 import com.ads.appgm.util.Constants;
-import com.ads.appgm.util.MyTimestamp;
 import com.ads.appgm.util.SharedPreferenceUtil;
 
 import java.util.Calendar;

@@ -1,10 +1,6 @@
 package com.ads.appgm.service;
 
-import android.content.SharedPreferences;
-
 import com.ads.appgm.BuildConfig;
-import com.ads.appgm.util.Constants;
-import com.ads.appgm.util.SharedPreferenceUtil;
 
 import java.util.concurrent.TimeUnit;
 
