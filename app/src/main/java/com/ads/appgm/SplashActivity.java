@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat;
 
 import com.ads.appgm.notification.Notification;
 import com.ads.appgm.util.Constants;
+import com.ads.appgm.util.MyTimestamp;
 import com.ads.appgm.util.SharedPreferenceUtil;
 
 import java.util.Calendar;
@@ -32,13 +33,13 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new SharedPreferenceUtil(getApplicationContext());
+        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
         lm = (LocationManager) getSystemService(Activity.LOCATION_SERVICE);
         Notification notification = new Notification(getApplicationContext());
         notification.createNotificationChannel();
-        new SharedPreferenceUtil(getApplicationContext());
         Calendar now = Calendar.getInstance();
-        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
-//        String expiration = sp.getString(Constants.EXPIRATION_DATE, MyTimestamp.IsofromCalendar(now));
+        String expiration = sp.getString(Constants.EXPIRATION_DATE, MyTimestamp.isoFromCalendar(now));
 //        Calendar expirationDate = MyTimestamp.
         validLogin = false;
     }

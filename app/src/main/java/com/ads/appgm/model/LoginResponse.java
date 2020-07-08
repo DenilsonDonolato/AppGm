@@ -4,17 +4,15 @@ public class LoginResponse {
 
     private String token;
     private long id;
-    private String nome;
-    private String validade;
+    private String name;
 
     public LoginResponse() {
     }
 
-    public LoginResponse(String token, long id, String nome, String validade) {
+    public LoginResponse(String token, long id, String name) {
         this.token = token;
         this.id = id;
-        this.nome = nome;
-        this.validade = validade;
+        this.name = name;
     }
 
     public String getToken() {
@@ -33,19 +31,11 @@ public class LoginResponse {
         this.id = id;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getValidade() {
-        return validade;
-    }
-
-    public void setValidade(String validade) {
-        this.validade = validade;
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -57,13 +57,11 @@ public class LoginActivity extends AppCompatActivity {
         }
         BackEndService client = HttpClient.getInstance();
         Login login = new Login(
-                binding.editTextCPF.getText().toString(),
+                binding.editTextCPF.getText().toString().replace(".", "").replace("-", ""),
                 binding.editTextPassword.getText().toString()
         );
-
         Call<LoginResponse> loginResponse = client.loginRequest(login);
         loginResponse.enqueue(loginResponseCallback);
-
     }
 
     public void hideKeyboard(View view) {
@@ -115,8 +113,7 @@ public class LoginActivity extends AppCompatActivity {
             SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
             sp.edit().putString(Constants.USER_TOKEN, loginResponse.getToken())
                     .putLong(Constants.USER_ID, loginResponse.getId())
-                    .putString(Constants.USER_NAME, loginResponse.getNome())
-                    .putString(Constants.EXPIRATION_DATE, loginResponse.getValidade())
+                    .putString(Constants.USER_NAME, loginResponse.getName())
                     .apply();
             setResult(RESULT_OK);
             Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 150);
