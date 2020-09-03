@@ -14,6 +14,6 @@ public interface BackEndService {
     @POST("mobile/login")
     Call<LoginResponse> loginRequest(@Body Login login);
 
-    @POST("location")
-    Call<String> postLocation(@Body Location location, @Header("Authorization") String token);
+    @POST("mobile/localization")
+    Call<Void> postLocation(@Body Location location, @Header("Authorization") String token);
 }

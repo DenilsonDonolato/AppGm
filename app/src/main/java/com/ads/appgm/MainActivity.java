@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         binding.textViewName.setText(message);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        binding.panicFunction.setOnClickListener(this::openAccessibilitySettings);
+//        binding.panicFunction.setOnClickListener(this::openAccessibilitySettings);
 
         //transAnimButFlash = (TransitionDrawable) panicButton.getBackground();
         //transAnimButFlash.resetTransition();
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
                 this.setPanicButtonStatus(this.isPanicOn());
             }
         }
-        binding.panicFunction.setChecked(isPaniqueQuickServiceRunning());
+//        binding.panicFunction.setChecked(isPaniqueQuickServiceRunning());
         instance=this;
     }
 
@@ -140,12 +140,12 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     }
 
     public void openAccessibilitySettings(View v) {
-        if (binding.panicFunction.isChecked()) {
-            Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
-            startActivity(intent);
-        } else {
-            this.showDialogPermission();
-        }
+//        if (binding.panicFunction.isChecked()) {
+//            Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+//            startActivity(intent);
+//        } else {
+//            this.showDialogPermission();
+//        }
     }
 
     private void showDialogPermission() {
