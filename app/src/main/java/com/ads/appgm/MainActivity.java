@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 
 import com.ads.appgm.clickListeners.ButtonPanic;
@@ -75,9 +76,9 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
         boolean isActive = sp.getBoolean("panicActive", false);
         if (isActive){
-            binding.buttonPanic.setBackground(getDrawable(R.drawable.custom_button_active));
+            binding.buttonPanic.setBackground(ContextCompat.getDrawable(getBaseContext(),R.drawable.custom_button_active));
         }else{
-            binding.buttonPanic.setBackground(getDrawable(R.drawable.custom_button_inactive));
+            binding.buttonPanic.setBackground(ContextCompat.getDrawable(getBaseContext(),R.drawable.custom_button_inactive));
         }
     }
 
