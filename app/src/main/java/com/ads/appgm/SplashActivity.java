@@ -11,6 +11,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,9 +40,13 @@ public class SplashActivity extends AppCompatActivity {
         Notification notification = new Notification(getApplicationContext());
         notification.createNotificationChannel();
         Calendar now = Calendar.getInstance();
-        String expiration = sp.getString(Constants.EXPIRATION_DATE, MyTimestamp.isoFromCalendar(now));
+
+        //Checar validade do login
+//        String expiration = sp.getString(Constants.EXPIRATION_DATE, MyTimestamp.isoFromCalendar(now));
 //        Calendar expirationDate = MyTimestamp.
-        validLogin = false;
+        //Caso inválido usar sp.putLong(Constants.USER,0);
+
+        validLogin = sp.getLong(Constants.USER_ID, 0) != 0;
     }
 
     @Override
@@ -99,7 +104,8 @@ public class SplashActivity extends AppCompatActivity {
 
     private void goToLoginActivity() {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-        startActivityForResult(intent, Constants.LOGIN_INTENT_REQUEST);
+        startActivity(intent);
+        finish();
     }
 
     private void goToMainActivity() {
@@ -112,13 +118,6 @@ public class SplashActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case Constants.LOGIN_INTENT_REQUEST:
-                if (resultCode == RESULT_OK) {
-                    goToMainActivity();
-                } else {
-                    finish();
-                }
-                break;
             case Constants.GPS_PERMISSION_REQUEST:
                 if(resultCode == RESULT_OK){
                     startApp();
@@ -127,7 +126,12 @@ public class SplashActivity extends AppCompatActivity {
                 }
                 break;
             case Constants.GPS_TURN_ON:
-                startApp();
+                if(gpsLigado()) {
+                    startApp();
+                } else {
+                    Toast.makeText(getApplicationContext(), R.string.gps_off_warning, Toast.LENGTH_LONG).show();
+                    finishAffinity();
+                }
                 break;
             default:
                 goToLoginActivity();

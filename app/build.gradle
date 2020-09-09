@@ -21,7 +21,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://url.back-end.com/\"")
         }
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://178b9eaf0766.ngrok.io\"")
+            buildConfigField("String", "BASE_URL", "\"https://8b6787b246a1.ngrok.io\"")
         }
     }
 
@@ -46,7 +46,7 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
-    implementation 'com.google.android.material:material:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.media:media:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'

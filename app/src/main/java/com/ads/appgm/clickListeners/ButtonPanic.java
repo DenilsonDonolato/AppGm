@@ -22,6 +22,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +37,8 @@ public class ButtonPanic implements View.OnClickListener {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private LocationCallback locationCallback;
 
-    public ButtonPanic(FusedLocationProviderClient fusedLocationProviderClient, Activity activity) {
-        this.fusedLocationProviderClient = fusedLocationProviderClient;
+    public ButtonPanic(Activity activity) {
+        this.fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity);
         this.activity = activity;
     }
 

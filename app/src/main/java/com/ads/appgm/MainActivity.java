@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     boolean panicButtonStatus = false;
     int btnAnimTime = 200;
-    private FusedLocationProviderClient fusedLocationProviderClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         }
         binding.textViewName.setText(message);
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 //        binding.panicFunction.setOnClickListener(this::openAccessibilitySettings);
 
         //transAnimButFlash = (TransitionDrawable) panicButton.getBackground();
@@ -100,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     @Override
     protected void onStart() {
-        binding.buttonPanic.setOnClickListener(new ButtonPanic(fusedLocationProviderClient, this));
+        binding.buttonPanic.setOnClickListener(new ButtonPanic(this));
 
         super.onStart();
     }

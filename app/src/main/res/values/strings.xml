@@ -53,4 +53,5 @@
     <string name="panic_quick">Função de Pânico</string>
     <string name="panic_quick_on">Pânico Rápido ativado, use os botões de volume para ativar o pânico</string>
     <string name="panic_quick_off">Ative a função de Pânico rápido para ativar o pânico usando os botões de volume</string>
+    <string name="gps_off_warning">É necessário ativar o GPS</string>
 </resources>
