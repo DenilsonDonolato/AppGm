@@ -210,9 +210,9 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.nav_recordings:
-                Toast.makeText(this,"Clicou no Gravações",Toast.LENGTH_SHORT).show();
-                break;
+//            case R.id.nav_recordings:
+//                Toast.makeText(this,"Clicou no Gravações",Toast.LENGTH_SHORT).show();
+//                break;
             case R.id.nav_settings:
                 Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
                 startActivity(intent);
