@@ -26,8 +26,6 @@ import com.ads.appgm.service.PaniqueQuick;
 import com.ads.appgm.util.Constants;
 import com.ads.appgm.util.SettingsUtils;
 import com.ads.appgm.util.SharedPreferenceUtil;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.material.navigation.NavigationView;
 
 

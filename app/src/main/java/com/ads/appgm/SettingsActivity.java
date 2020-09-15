@@ -12,6 +12,7 @@ import androidx.preference.PreferenceManager;
 
 import com.ads.appgm.databinding.SettingsActivityBinding;
 import com.ads.appgm.dialog.PermissionDialog;
+import com.ads.appgm.service.PaniqueQuick;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -24,7 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(binding.settings.getId(), new SettingsFragment(this))
+                .replace(binding.settings.getId(), SettingsFragment.newInstance(this))
                 .commit();
         setSupportActionBar(binding.settingsToolbar.getRoot());
         ActionBar actionBar = getSupportActionBar();
@@ -34,10 +35,21 @@ public class SettingsActivity extends AppCompatActivity {
         binding.settingsToolbar.getRoot().setNavigationOnClickListener(view -> onBackPressed());
     }
 
-    public static class SettingsFragment extends PreferenceFragmentCompat {
-        private AppCompatActivity activity;
+    private boolean isPaniqueQuickServiceRunning() {
+        return PaniqueQuick.getInstance() != null;
+    }
 
-        public SettingsFragment(SettingsActivity settingsActivity) {
+    public static class SettingsFragment extends PreferenceFragmentCompat {
+        private SettingsActivity activity;
+
+        public static SettingsFragment newInstance(SettingsActivity activity) {
+            return new SettingsFragment(activity);
+        }
+
+        public SettingsFragment(){
+        }
+
+        private SettingsFragment(SettingsActivity settingsActivity) {
             this.activity = settingsActivity;
         }
 
@@ -54,7 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
                     openAccessibilitySettings(pm.getBoolean("panic_quick", false));
 
             }
-            return super.onPreferenceTreeClick(preference);
+            return true;
         }
 
         public void openAccessibilitySettings(boolean isChecked) {
