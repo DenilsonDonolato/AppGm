@@ -18,9 +18,12 @@
         <TextView
             android:id="@+id/textViewName"
             style="@style/textOnScreen"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
             android:text=""
+            android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
             app:layout_constraintBottom_toTopOf="@id/buttonPanic"
             app:layout_constraintEnd_toEndOf="parent"

@@ -21,7 +21,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://url.back-end.com/\"")
         }
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://8b6787b246a1.ngrok.io\"")
+            buildConfigField("String", "BASE_URL", "\"https://7ac78a3eea48.ngrok.io\"")
         }
     }
 
