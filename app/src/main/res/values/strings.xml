@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SOS beauty</string>
+    <string name="app_name">SOS Maria</string>
     <string name="title_activity_login">Entrar</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>

@@ -8,7 +8,6 @@ import com.ads.appgm.manager.device.output.panic.Panic;
 import com.ads.appgm.manager.device.output.panic.flashlight.Flashlight;
 import com.ads.appgm.manager.device.output.panic.flashlight.Flashlight1;
 import com.ads.appgm.manager.device.output.panic.flashlight.Flashlight2;
-import com.ads.appgm.manager.device.output.panic.screenlight.Screenlight;
 import com.ads.appgm.manager.timer.CountTimer;
 import com.ads.appgm.manager.timer.CountTimerListener;
 
@@ -62,8 +61,6 @@ public class PanicManager implements CountTimerListener {
                 } else if (this.flashType.equals(Flashlight2.TYPE)) {
                     this.mPanic = new Flashlight2(context);
                 }
-            } else if (this.panicType.equals(Screenlight.TYPE)) {
-                this.mPanic = new Screenlight(context);
             }
             if (this.mListener != null) {
                 this.mPanic.setListener(this.mListener);
