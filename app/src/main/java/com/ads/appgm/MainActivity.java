@@ -51,7 +51,11 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     }
 
     private void setButtonPanicState(SharedPreferences sp) {
-        togglePanic(sp.getBoolean("panicActive", false));
+        boolean status = sp.getBoolean("panicActive", false);
+        if (isPaniqueQuickServiceRunning()) {
+            status |= PaniqueQuick.getInstance().getPanicStatus();
+        }
+        togglePanic(status);
     }
 
     private void togglePanic(boolean isActive) {
