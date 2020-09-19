@@ -11,7 +11,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
 import com.ads.appgm.databinding.SettingsActivityBinding;
-import com.ads.appgm.dialog.PermissionDialog;
+import com.ads.appgm.dialog.DisablePanicQuickDialog;
 import com.ads.appgm.service.PaniqueQuick;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -79,7 +79,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         private void showDialogPermission() {
-            PermissionDialog permissionDialog = new PermissionDialog();
+            DisablePanicQuickDialog permissionDialog = new DisablePanicQuickDialog();
             permissionDialog.show(activity.getFragmentManager(), "Permission Dialog");
         }
     }
