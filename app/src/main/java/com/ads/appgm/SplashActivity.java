@@ -77,7 +77,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void startApp() {
-        if(gpsLigado()){
+        if (gpsLigado()) {
             if (validLogin) {
                 goToMainActivity();
             } else {
@@ -118,14 +118,14 @@ public class SplashActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case Constants.GPS_PERMISSION_REQUEST:
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     startApp();
                 } else {
                     showGPSDialog();
                 }
                 break;
             case Constants.GPS_TURN_ON:
-                if(gpsLigado()) {
+                if (gpsLigado()) {
                     startApp();
                 } else {
                     Toast.makeText(getApplicationContext(), R.string.gps_off_warning, Toast.LENGTH_LONG).show();
@@ -202,7 +202,7 @@ public class SplashActivity extends AppCompatActivity {
     private DialogInterface.OnClickListener listenerGpsOn = (dialog, which) -> {
         if (which == Dialog.BUTTON_POSITIVE) {
             Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivityForResult(intent,Constants.GPS_TURN_ON);
+            startActivityForResult(intent, Constants.GPS_TURN_ON);
         } else {
             dialog.dismiss();
             finishAffinity();

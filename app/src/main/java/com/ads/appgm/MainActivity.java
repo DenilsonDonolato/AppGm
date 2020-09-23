@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
         setSupportActionBar(binding.toolbar.getRoot());
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.getRoot(), binding.toolbar.getRoot(),
-                R.string.open_drawer,R.string.close_drawer);
+                R.string.open_drawer, R.string.close_drawer);
         binding.getRoot().addDrawerListener(toggle);
         toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.textColor));
         toggle.syncState();
@@ -59,10 +59,10 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     }
 
     private void togglePanic(boolean isActive) {
-        if (isActive){
-            binding.buttonPanic.setBackground(ContextCompat.getDrawable(getBaseContext(),R.drawable.custom_button_active));
-        }else{
-            binding.buttonPanic.setBackground(ContextCompat.getDrawable(getBaseContext(),R.drawable.custom_button_inactive));
+        if (isActive) {
+            binding.buttonPanic.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.custom_button_active));
+        } else {
+            binding.buttonPanic.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.custom_button_inactive));
         }
     }
 
@@ -96,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     @Override
     protected void onStart() {
         binding.buttonPanic.setOnClickListener(new ButtonPanic(this));
-
         super.onStart();
     }
 
@@ -106,7 +105,8 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         if (isPaniqueQuickServiceRunning()) {
             PaniqueQuick.getInstance().registerPaniqueManagerListener(this);
         }
-        instance=this;
+        setButtonPanicState(SharedPreferenceUtil.getSharedePreferences());
+        instance = this;
     }
 
     @Override
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
             PaniqueQuick.getInstance().unregisterPaniqueManagerListener();
         }
         super.onPause();
-        instance=null;
+        instance = null;
     }
 
     @Override
@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu,menu);
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
     }
 
@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_help:
-                Toast.makeText(this,"TODO: Mostrar tela de ajuda.",Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "TODO: Mostrar tela de ajuda.", Toast.LENGTH_LONG).show();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 //                Toast.makeText(this,"Clicou no Gravações",Toast.LENGTH_SHORT).show();
 //                break;
             case R.id.nav_settings:
-                Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 break;
         }

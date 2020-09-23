@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
+import androidx.preference.SwitchPreferenceCompat;
 
 import com.ads.appgm.databinding.SettingsActivityBinding;
 import com.ads.appgm.dialog.DisablePanicQuickDialog;
@@ -35,10 +36,6 @@ public class SettingsActivity extends AppCompatActivity {
         binding.settingsToolbar.getRoot().setNavigationOnClickListener(view -> onBackPressed());
     }
 
-    private boolean isPaniqueQuickServiceRunning() {
-        return PaniqueQuick.getInstance() != null;
-    }
-
     public static class SettingsFragment extends PreferenceFragmentCompat {
         private SettingsActivity activity;
 
@@ -46,7 +43,7 @@ public class SettingsActivity extends AppCompatActivity {
             return new SettingsFragment(activity);
         }
 
-        public SettingsFragment(){
+        public SettingsFragment() {
         }
 
         private SettingsFragment(SettingsActivity settingsActivity) {
@@ -63,8 +60,9 @@ public class SettingsActivity extends AppCompatActivity {
             SharedPreferences pm = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
             switch (preference.getKey()) {
                 case "panic_quick":
+                    adjustPanicSwitch();
                     openAccessibilitySettings(pm.getBoolean("panic_quick", false));
-
+                    break;
             }
             return true;
         }
@@ -81,6 +79,27 @@ public class SettingsActivity extends AppCompatActivity {
         private void showDialogPermission() {
             DisablePanicQuickDialog permissionDialog = new DisablePanicQuickDialog();
             permissionDialog.show(activity.getFragmentManager(), "Permission Dialog");
+        }
+
+        private boolean isPaniqueQuickServiceRunning() {
+            return PaniqueQuick.getInstance() != null;
+        }
+
+        @Override
+        public void onResume() {
+            adjustPanicSwitch();
+            super.onResume();
+        }
+
+        private void adjustPanicSwitch() {
+            SwitchPreferenceCompat panic = findPreference("panic_quick");
+            if (panic != null) {
+                if (isPaniqueQuickServiceRunning()) {
+                    panic.setChecked(true);
+                } else {
+                    panic.setChecked(false);
+                }
+            }
         }
     }
 }

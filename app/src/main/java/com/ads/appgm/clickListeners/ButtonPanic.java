@@ -47,12 +47,12 @@ public class ButtonPanic implements View.OnClickListener {
 
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
         boolean isActive = sp.getBoolean("panicActive", false);
-        if (isActive){
+        if (isActive) {
             sp.edit().putBoolean("panicActive", false).apply();
-            v.setBackground(ContextCompat.getDrawable(activity.getBaseContext(),R.drawable.custom_button_inactive));
-        }else{
+            v.setBackground(ContextCompat.getDrawable(activity.getBaseContext(), R.drawable.custom_button_inactive));
+        } else {
             sp.edit().putBoolean("panicActive", true).apply();
-            v.setBackground(ContextCompat.getDrawable(activity.getBaseContext(),R.drawable.custom_button_active));
+            v.setBackground(ContextCompat.getDrawable(activity.getBaseContext(), R.drawable.custom_button_active));
             if (ActivityCompat.checkSelfPermission(v.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                     ActivityCompat.checkSelfPermission(v.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -66,7 +66,7 @@ public class ButtonPanic implements View.OnClickListener {
                     locationRequest.setExpirationDuration(5000);
                     locationRequest.setInterval(100);
                     locationRequest.setNumUpdates(1);
-                    fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback,Looper.getMainLooper());
+                    fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
                     return;
                 }
                 update(v, location);
@@ -82,7 +82,7 @@ public class ButtonPanic implements View.OnClickListener {
                 }
                 for (Location location : locationResult.getLocations()) {
                     activity.runOnUiThread(() -> {
-                        update(v,location);
+                        update(v, location);
                     });
                 }
             }
@@ -101,24 +101,24 @@ public class ButtonPanic implements View.OnClickListener {
         position.add(location.getLongitude());
         com.ads.appgm.model.Location location1 = new com.ads.appgm.model.Location(position);
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
-        Call<Void> call = client.postLocation(location1,sp.getString(Constants.USER_TOKEN,""));
+        Call<Void> call = client.postLocation(location1, sp.getString(Constants.USER_TOKEN, ""));
         call.enqueue(responseCallback);
     }
 
     Callback<Void> responseCallback = new Callback<Void>() {
         @Override
         public void onResponse(Call<Void> call, Response<Void> response) {
-            if(response.code()==200) {
+            if (response.code() == 200) {
                 Toast.makeText(activity.getBaseContext(), "Enviou GPS", Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(activity.getBaseContext(), "Erro "+response.code(), Toast.LENGTH_LONG).show();
+                Toast.makeText(activity.getBaseContext(), "Erro " + response.code(), Toast.LENGTH_LONG).show();
             }
         }
 
         @Override
         public void onFailure(Call<Void> call, Throwable t) {
-            Toast.makeText(activity.getBaseContext(), "Erro "+t.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-            if(!call.isCanceled()){
+            Toast.makeText(activity.getBaseContext(), "Erro " + t.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+            if (!call.isCanceled()) {
                 call.cancel();
             }
         }

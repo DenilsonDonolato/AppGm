@@ -13,11 +13,11 @@ import com.ads.appgm.R;
 public class Notification {
     private Context context;
 
-    public Notification (Context context){
+    public Notification(Context context) {
         this.context = context;
     }
 
-    public void show(String title, String content, int id){
+    public void show(String title, String content, int id) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "test")
                 .setSmallIcon(R.drawable.settings)
                 .setContentTitle(title)
@@ -29,8 +29,9 @@ public class Notification {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
         // notificationId is a unique int for each notification that you must define
-        notificationManager.notify( id, builder.build());
+        notificationManager.notify(id, builder.build());
     }
+
     public void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
