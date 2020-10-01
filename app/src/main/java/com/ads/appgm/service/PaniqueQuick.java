@@ -36,10 +36,7 @@ public class PaniqueQuick extends AccessibilityService implements PaniqueManager
     }
 
     public void setScreenState(ScreenState currentScreenState) {
-        if (currentScreenState == ScreenState.SCREEN_OFF) {
-            PaniqueManager.getInstance(this).setVolumeProvider(this.getVolumeChangeProvider());
-        }
-        PaniqueManager.getInstance(this).setScreenEvent(currentScreenState);
+        PaniqueManager.getInstance(this).setVolumeProvider(this.getVolumeChangeProvider());
     }
 
     public void setVolumeValues(int volumeDirection) {

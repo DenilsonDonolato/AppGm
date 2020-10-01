@@ -1,13 +1,10 @@
-package com.ads.appgm.manager.device.output.panic.flashlight;
+package com.ads.appgm.manager.device.output.panic;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Looper;
@@ -15,61 +12,34 @@ import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
-import com.ads.appgm.R;
 import com.ads.appgm.notification.Notification;
 import com.ads.appgm.util.Constants;
+import com.ads.appgm.util.SharedPreferenceUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
-@TargetApi(23)
-public class Flashlight2 extends Flashlight {
-    public static final String TYPE = Constants.ID_DEVICE_OUTPUT_PANIC_FLASH_NEW;
+public class Panique2 extends Panique {
 
     private Context context;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private LocationCallback locationCallback;
 
-    private String[] mCameraIDList;
-    private boolean flashSupported;
-
-    public Flashlight2(Context context) {
+    public Panique2(Context context) {
         super(context);
-        flashSupported = false;
-        this.deviceType = TYPE;
         this.context = context;
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
     }
 
     @Override
     protected void turnOn() {
+        new SharedPreferenceUtil(context);
+        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        sp.edit().putBoolean(Constants.PANIC, true).apply();
         panic();
-        if (!this.getStatus()) {
-            CameraManager mCameraManager = (CameraManager) this.mContext.getSystemService(Context.CAMERA_SERVICE);
-            try {
-                this.mCameraIDList = mCameraManager.getCameraIdList();
-            } catch (CameraAccessException e) {
-                this.updateError(this.mContext.getResources().getString(R.string.camera_error));
-                return;
-            }
-            try {
-                CameraCharacteristics mCameraParameters = mCameraManager.getCameraCharacteristics(this.mCameraIDList[0]);
-                this.flashSupported = mCameraParameters.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
-            } catch (Exception e) {
-                this.updateError(this.mContext.getResources().getString(R.string.panic_unsupported));
-                return;
-            }
-            if (this.flashSupported) {
-                try {
-                    mCameraManager.setTorchMode(this.mCameraIDList[0], true);
-                    this.updateStatus(true);
-                } catch (CameraAccessException e) {
-                    this.updateError(this.mContext.getResources().getString(R.string.camera_busy));
-                }
-            }
-        }
+        this.updateStatus(true);
     }
 
     private void panic() {
@@ -120,19 +90,9 @@ public class Flashlight2 extends Flashlight {
 
     @Override
     protected void turnOff() {
-        panic();
-        if (this.getStatus()) {
-            if (this.mCameraIDList != null && this.flashSupported) {
-                CameraManager mCameraManager = (CameraManager) this.mContext.getSystemService(Context.CAMERA_SERVICE);
-                try {
-                    mCameraManager.setTorchMode(mCameraIDList[0], false);
-                } catch (CameraAccessException e) {
-                    this.updateError(this.mContext.getResources().getString(R.string.panic_unsupported));
-                    return;
-                }
-                this.updateStatus(false);
-            }
-        }
+        new SharedPreferenceUtil(context);
+        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        sp.edit().putBoolean(Constants.PANIC, false).apply();
+        this.updateStatus(false);
     }
-
 }

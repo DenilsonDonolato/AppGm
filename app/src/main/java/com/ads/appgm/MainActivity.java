@@ -17,14 +17,16 @@ import androidx.core.view.GravityCompat;
 
 import com.ads.appgm.clickListeners.ButtonPanic;
 import com.ads.appgm.databinding.ActivityMainBinding;
+import com.ads.appgm.manager.PanicManager;
 import com.ads.appgm.manager.PaniqueManagerListener;
+import com.ads.appgm.manager.device.output.OutputDeviceListener;
 import com.ads.appgm.service.PaniqueQuick;
 import com.ads.appgm.util.Constants;
 import com.ads.appgm.util.SharedPreferenceUtil;
 import com.google.android.material.navigation.NavigationView;
 
 
-public class MainActivity extends AppCompatActivity implements PaniqueManagerListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements PaniqueManagerListener, OutputDeviceListener, NavigationView.OnNavigationItemSelectedListener {
 
     private ActivityMainBinding binding;
     public static MainActivity instance;
@@ -102,9 +104,10 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     @Override
     protected void onResume() {
         super.onResume();
-        if (isPaniqueQuickServiceRunning()) {
+        if (this.isPaniqueQuickServiceRunning()) {
             PaniqueQuick.getInstance().registerPaniqueManagerListener(this);
         }
+        PanicManager.getInstance(true).setListener(this);
         setButtonPanicState(SharedPreferenceUtil.getSharedePreferences());
         instance = this;
     }
@@ -114,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         if (this.isPaniqueQuickServiceRunning()) {
             PaniqueQuick.getInstance().unregisterPaniqueManagerListener();
         }
+        PanicManager.getInstance(true).setListener(null);
         super.onPause();
         instance = null;
     }
@@ -125,6 +129,11 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     @Override
     public void onPanicStatusChanged(final boolean status) {
+        runOnUiThread(() -> togglePanic(status));
+    }
+
+    @Override
+    public void onStatusChanged(String deviceType, boolean status) {
         runOnUiThread(() -> togglePanic(status));
     }
 

@@ -46,12 +46,12 @@ public class ButtonPanic implements View.OnClickListener {
     public void onClick(View v) {
 
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
-        boolean isActive = sp.getBoolean("panicActive", false);
+        boolean isActive = sp.getBoolean(Constants.PANIC, false);
         if (isActive) {
-            sp.edit().putBoolean("panicActive", false).apply();
+            sp.edit().putBoolean(Constants.PANIC, false).apply();
             v.setBackground(ContextCompat.getDrawable(activity.getBaseContext(), R.drawable.custom_button_inactive));
         } else {
-            sp.edit().putBoolean("panicActive", true).apply();
+            sp.edit().putBoolean(Constants.PANIC, true).apply();
             v.setBackground(ContextCompat.getDrawable(activity.getBaseContext(), R.drawable.custom_button_active));
             if (ActivityCompat.checkSelfPermission(v.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                     ActivityCompat.checkSelfPermission(v.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
