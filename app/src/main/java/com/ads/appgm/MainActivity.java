@@ -17,6 +17,7 @@ import androidx.core.view.GravityCompat;
 
 import com.ads.appgm.clickListeners.ButtonPanic;
 import com.ads.appgm.databinding.ActivityMainBinding;
+import com.ads.appgm.help.HelpActivity;
 import com.ads.appgm.manager.PaniqueManagerListener;
 import com.ads.appgm.service.PaniqueQuick;
 import com.ads.appgm.util.Constants;
@@ -142,10 +143,15 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_help:
-                Toast.makeText(this, "TODO: Mostrar tela de ajuda.", Toast.LENGTH_LONG).show();
+                initHelp();
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void initHelp() {
+        Intent intent = new Intent(MainActivity.this, HelpActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -158,6 +164,10 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.nav_help:
+                initHelp();
+                break;
+
         }
         binding.getRoot().closeDrawer(GravityCompat.START);
 
