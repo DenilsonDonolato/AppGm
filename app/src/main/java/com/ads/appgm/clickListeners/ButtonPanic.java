@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import com.ads.appgm.R;
@@ -48,6 +49,8 @@ public class ButtonPanic implements View.OnClickListener {
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
         boolean isActive = sp.getBoolean(Constants.PANIC, false);
         if (isActive) {
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(activity.getApplicationContext());
+            notificationManager.cancel(1);
             sp.edit().putBoolean(Constants.PANIC, false).apply();
             v.setBackground(ContextCompat.getDrawable(activity.getBaseContext(), R.drawable.custom_button_inactive));
         } else {

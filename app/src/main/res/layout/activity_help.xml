@@ -19,6 +19,7 @@
         android:layout_height="0dp"
         app:autoPlay="false"
         app:fillColor="@color/colorPrimary"
+        app:indicatorMarginVertical="15dp"
         app:indicatorVisibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
