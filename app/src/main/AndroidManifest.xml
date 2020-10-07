@@ -14,11 +14,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".help.HelpActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
             android:screenOrientation="portrait"
-            android:theme="@style/textOnScreen"
-            android:label="@string/title_activity_settings"/>
+            android:theme="@style/textOnScreen" />
         <activity
             android:name=".LoginActivity"
             android:screenOrientation="portrait"
@@ -34,16 +36,6 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".ui.activity.ScreenflashActivity"
-            android:configChanges="orientation"
-            android:launchMode="singleInstance"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
-            <intent-filter>
-                <action android:name="com.ads.appgm.CLOSE_ACTIVITY" />
             </intent-filter>
         </activity>
 
