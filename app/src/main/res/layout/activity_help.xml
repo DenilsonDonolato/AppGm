@@ -13,26 +13,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.jama.carouselview.CarouselView
-        android:id="@+id/carouselView"
+    <com.synnapps.carouselview.CarouselView
+        android:id="@+id/carouselHelp"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:carouselOffset="center"
-        app:enableSnapping="true"
-        app:indicatorAnimationType="drop"
-        app:indicatorPadding="5"
-        app:indicatorRadius="5"
-        app:indicatorSelectedColor="@color/colorAccent"
-        app:indicatorUnselectedColor="@color/colorPrimary"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:rotation="0"
+        android:rotationX="0"
+        android:rotationY="0"
+        app:autoPlay="false"
+        app:fillColor="@color/colorPrimary"
+        app:indicatorMarginVertical="0dp"
+        app:indicatorVisibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/settings_toolbar"
-        app:resource="@layout/carousel_image"
-        app:scaleOnScroll="false"
-        app:setAutoPlay="true"
-        app:setAutoPlayDelay="3000"
-        app:size="10"
-        app:spacing="10" />
+        app:pageColor="@android:color/darker_gray"
+        app:radius="5dp"
+        app:strokeColor="@android:color/white"
+        app:strokeWidth="1dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

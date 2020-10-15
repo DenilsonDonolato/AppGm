@@ -35,7 +35,7 @@ public class Panique2 extends Panique {
 
     @Override
     protected void turnOn() {
-        new SharedPreferenceUtil(context);
+        SharedPreferenceUtil.initialize(context);
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
         sp.edit().putBoolean(Constants.PANIC, true).apply();
         panic();
@@ -90,7 +90,7 @@ public class Panique2 extends Panique {
 
     @Override
     protected void turnOff() {
-        new SharedPreferenceUtil(context);
+        SharedPreferenceUtil.initialize(context);
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
         sp.edit().putBoolean(Constants.PANIC, false).apply();
         this.updateStatus(false);
