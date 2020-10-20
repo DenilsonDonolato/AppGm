@@ -11,6 +11,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,7 +21,6 @@ import androidx.core.content.ContextCompat;
 
 import com.ads.appgm.notification.Notification;
 import com.ads.appgm.util.Constants;
-import com.ads.appgm.util.MyTimestamp;
 import com.ads.appgm.util.SharedPreferenceUtil;
 
 import java.util.Calendar;
@@ -33,15 +33,19 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new SharedPreferenceUtil(getApplicationContext());
+        SharedPreferenceUtil.initialize(getApplicationContext());
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
         lm = (LocationManager) getSystemService(Activity.LOCATION_SERVICE);
         Notification notification = new Notification(getApplicationContext());
         notification.createNotificationChannel();
         Calendar now = Calendar.getInstance();
-        String expiration = sp.getString(Constants.EXPIRATION_DATE, MyTimestamp.isoFromCalendar(now));
+
+        //Checar validade do login
+//        String expiration = sp.getString(Constants.EXPIRATION_DATE, MyTimestamp.isoFromCalendar(now));
 //        Calendar expirationDate = MyTimestamp.
-        validLogin = false;
+        //Caso inválido usar sp.putLong(Constants.USER,0);
+
+        validLogin = sp.getLong(Constants.USER_ID, 0) != 0;
     }
 
     @Override
@@ -73,7 +77,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void startApp() {
-        if(gpsLigado()){
+        if (gpsLigado()) {
             if (validLogin) {
                 goToMainActivity();
             } else {
@@ -99,7 +103,8 @@ public class SplashActivity extends AppCompatActivity {
 
     private void goToLoginActivity() {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-        startActivityForResult(intent, Constants.LOGIN_INTENT_REQUEST);
+        startActivity(intent);
+        finish();
     }
 
     private void goToMainActivity() {
@@ -113,22 +118,20 @@ public class SplashActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case Constants.LOGIN_INTENT_REQUEST:
-                if (resultCode == RESULT_OK) {
-                    goToMainActivity();
-                } else {
-                    finish();
-                }
-                break;
             case Constants.GPS_PERMISSION_REQUEST:
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     startApp();
                 } else {
                     showGPSDialog();
                 }
                 break;
             case Constants.GPS_TURN_ON:
-                startApp();
+                if (gpsLigado()) {
+                    startApp();
+                } else {
+                    Toast.makeText(getApplicationContext(), R.string.gps_off_warning, Toast.LENGTH_LONG).show();
+                    finishAffinity();
+                }
                 break;
             default:
                 goToLoginActivity();
@@ -200,7 +203,7 @@ public class SplashActivity extends AppCompatActivity {
     private DialogInterface.OnClickListener listenerGpsOn = (dialog, which) -> {
         if (which == Dialog.BUTTON_POSITIVE) {
             Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivityForResult(intent,Constants.GPS_TURN_ON);
+            startActivityForResult(intent, Constants.GPS_TURN_ON);
         } else {
             dialog.dismiss();
             finishAffinity();

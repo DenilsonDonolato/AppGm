@@ -5,7 +5,5 @@ public interface DeviceManagerListener {
 
     void onKeyActionPerformed();
 
-    void onProximityChanged(boolean status);
-
     void onError(String error);
 }

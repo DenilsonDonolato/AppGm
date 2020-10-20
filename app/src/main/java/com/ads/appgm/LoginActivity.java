@@ -1,5 +1,6 @@
 package com.ads.appgm;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -17,6 +18,8 @@ import com.ads.appgm.util.Animations;
 import com.ads.appgm.util.Constants;
 import com.ads.appgm.util.MaskEditUtil;
 import com.ads.appgm.util.SharedPreferenceUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -85,7 +88,7 @@ public class LoginActivity extends AppCompatActivity {
 
     Callback<LoginResponse> loginResponseCallback = new Callback<LoginResponse>() {
         @Override
-        public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+        public void onResponse(Call<LoginResponse> call, @NotNull Response<LoginResponse> response) {
             if (!call.isCanceled()) {
                 call.cancel();
             }
@@ -103,9 +106,7 @@ public class LoginActivity extends AppCompatActivity {
             LoginResponse loginResponse = response.body();
             if (loginResponse == null) {
                 runOnUiThread(() -> {
-                    runOnUiThread(() -> {
-                        Toast.makeText(getApplicationContext(), "Erro de Cadastro", Toast.LENGTH_LONG).show();
-                    });
+                    Toast.makeText(getApplicationContext(), "Erro de Cadastro", Toast.LENGTH_LONG).show();
                     Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 150);
                 });
                 return;
@@ -115,8 +116,9 @@ public class LoginActivity extends AppCompatActivity {
                     .putLong(Constants.USER_ID, loginResponse.getId())
                     .putString(Constants.USER_NAME, loginResponse.getName())
                     .apply();
-            setResult(RESULT_OK);
             Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 150);
+            Intent intent = new Intent(getApplicationContext(), SplashActivity.class);
+            startActivity(intent);
             finish();
         }
 

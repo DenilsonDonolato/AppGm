@@ -15,42 +15,31 @@
             android:id="@+id/toolbar"
             layout="@layout/app_toolbar" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/panic_function"
-            style="@style/panicSwitch"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:paddingStart="32dp"
-            android:paddingTop="32dp"
-            android:paddingEnd="32dp"
-            android:paddingBottom="32dp"
-            android:text="@string/funcao_panico"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
         <TextView
             android:id="@+id/textViewName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
             style="@style/textOnScreen"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:text=""
+            android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+            app:layout_constraintBottom_toTopOf="@id/buttonPanic"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/buttonPanic"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
         <android.widget.Button
             android:id="@+id/buttonPanic"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="192dp"
             android:background="@drawable/custom_button_inactive"
-            app:layout_constraintBottom_toTopOf="@+id/panic_function"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textViewName" />
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            app:layout_constraintVertical_bias="0.6" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

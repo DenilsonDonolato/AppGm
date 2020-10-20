@@ -1,31 +1,29 @@
 package com.ads.appgm.model;
 
+import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Location {
 
-    private Double latitude;
-    private Double longitude;
+    @NonNull
+    private List<Double> position;
 
     public Location() {
+        this.position = new ArrayList<>();
     }
 
-    public Location(Double latitude, Double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
+    public Location(@NonNull List<Double> position) {
+        this.position = position;
     }
 
-    public Double getLatitude() {
-        return latitude;
+    @NonNull
+    public List<Double> getPosition() {
+        return position;
     }
 
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
+    public void setPosition(@NonNull List<Double> position) {
+        this.position = position;
     }
 }

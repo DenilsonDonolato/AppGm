@@ -3,7 +3,6 @@ package com.ads.appgm;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,33 +12,25 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 
 import com.ads.appgm.clickListeners.ButtonPanic;
 import com.ads.appgm.databinding.ActivityMainBinding;
-import com.ads.appgm.dialog.PermissionDialog;
 import com.ads.appgm.manager.PanicManager;
+import com.ads.appgm.help.HelpActivity;
 import com.ads.appgm.manager.PaniqueManagerListener;
 import com.ads.appgm.manager.device.output.OutputDeviceListener;
 import com.ads.appgm.service.PaniqueQuick;
 import com.ads.appgm.util.Constants;
-import com.ads.appgm.util.SettingsUtils;
 import com.ads.appgm.util.SharedPreferenceUtil;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.material.navigation.NavigationView;
 
 
-public class MainActivity extends AppCompatActivity implements PaniqueManagerListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements PaniqueManagerListener, OutputDeviceListener, NavigationView.OnNavigationItemSelectedListener {
 
     private ActivityMainBinding binding;
     public static MainActivity instance;
-
-    private TransitionDrawable transAnimButFlash;
-
-    boolean panicButtonStatus = false;
-    int btnAnimTime = 200;
-    private FusedLocationProviderClient fusedLocationProviderClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +41,35 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         setAppTheme();
 
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        binding.textViewName.setText(getUserName(sp));
+        setButtonPanicState(sp);
+
+        setSupportActionBar(binding.toolbar.getRoot());
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.getRoot(), binding.toolbar.getRoot(),
+                R.string.open_drawer, R.string.close_drawer);
+        binding.getRoot().addDrawerListener(toggle);
+        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.textColor));
+        toggle.syncState();
+        binding.navView.setNavigationItemSelectedListener(this);
+    }
+
+    private void setButtonPanicState(SharedPreferences sp) {
+        boolean status = sp.getBoolean("panicActive", false);
+        if (isPaniqueQuickServiceRunning()) {
+            status |= PaniqueQuick.getInstance().getPanicStatus();
+        }
+        togglePanic(status);
+    }
+
+    private void togglePanic(boolean isActive) {
+        if (isActive) {
+            binding.buttonPanic.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.custom_button_active));
+        } else {
+            binding.buttonPanic.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.custom_button_inactive));
+        }
+    }
+
+    private String getUserName(SharedPreferences sp) {
         String message = "Olá";
         String nome = sp.getString(Constants.USER_NAME, null);
         if (nome != null) {
@@ -57,28 +77,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         } else {
             message += "!";
         }
-        binding.textViewName.setText(message);
-
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        binding.panicFunction.setOnClickListener(this::openAccessibilitySettings);
-
-        //transAnimButFlash = (TransitionDrawable) panicButton.getBackground();
-        //transAnimButFlash.resetTransition();
-
-        setSupportActionBar(binding.toolbar.getRoot());
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.getRoot(), binding.toolbar.getRoot(),
-                R.string.open_drawer,R.string.close_drawer);
-        binding.getRoot().addDrawerListener(toggle);
-        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.textColor));
-        toggle.syncState();
-        binding.navView.setNavigationItemSelectedListener(this);
-
-        boolean isActive = sp.getBoolean("panicActive", false);
-        if (isActive){
-            binding.buttonPanic.setBackground(getDrawable(R.drawable.custom_button_active));
-        }else{
-            binding.buttonPanic.setBackground(getDrawable(R.drawable.custom_button_inactive));
-        }
+        return message;
     }
 
     private void setAppTheme() {
@@ -99,33 +98,29 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     @Override
     protected void onStart() {
-        binding.buttonPanic.setOnClickListener(new ButtonPanic(fusedLocationProviderClient, this));
-
+        binding.buttonPanic.setOnClickListener(new ButtonPanic(this));
         super.onStart();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (isPaniqueQuickServiceRunning()) {
+        if (this.isPaniqueQuickServiceRunning()) {
             PaniqueQuick.getInstance().registerPaniqueManagerListener(this);
-            if (this.isPanicOn()) {
-                this.setPanicButtonStatus(this.isPanicOn());
-            }
         }
-        binding.panicFunction.setChecked(isPaniqueQuickServiceRunning());
-        instance=this;
+        PanicManager.getInstance(true).setListener(this);
+        setButtonPanicState(SharedPreferenceUtil.getSharedePreferences());
+        instance = this;
     }
 
     @Override
     protected void onPause() {
         if (this.isPaniqueQuickServiceRunning()) {
             PaniqueQuick.getInstance().unregisterPaniqueManagerListener();
-        } else if (this.isPanicOn()) {
-            this.togglePanic(null);
         }
+        PanicManager.getInstance(true).setListener(null);
         super.onPause();
-        instance=null;
+        instance = null;
     }
 
     @Override
@@ -135,66 +130,21 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     @Override
     public void onPanicStatusChanged(final boolean status) {
-        runOnUiThread(() -> setPanicButtonStatus(status));
+        runOnUiThread(() -> togglePanic(status));
     }
 
-    public void openAccessibilitySettings(View v) {
-        if (binding.panicFunction.isChecked()) {
-            Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
-            startActivity(intent);
-        } else {
-            this.showDialogPermission();
-        }
-    }
-
-    private void showDialogPermission() {
-        PermissionDialog permissionDialog = new PermissionDialog();
-        permissionDialog.show(getFragmentManager(), "Permission Dialog");
-    }
-
-    private void setPanicButtonStatus(boolean enabled) {
-        panicButtonStatus = enabled;
-        if (panicButtonStatus) {
-            //transAnimButFlash.startTransition(btnAnimTime);
-        } else {
-            //transAnimButFlash.reverseTransition(btnAnimTime);
-        }
+    @Override
+    public void onStatusChanged(String deviceType, boolean status) {
+        runOnUiThread(() -> togglePanic(status));
     }
 
     private boolean isPaniqueQuickServiceRunning() {
         return PaniqueQuick.getInstance() != null;
     }
 
-    public void togglePanic(View v) {
-        if (isPaniqueQuickServiceRunning()) {
-            PaniqueQuick.getInstance().togglePanic();
-        } else {
-            PanicManager.getInstance(SettingsUtils.getPanicSource(this), true).setListener(new OutputDeviceListener() {
-                @Override
-                public void onStatusChanged(String deviceType, final boolean status) {
-                    runOnUiThread(() -> setPanicButtonStatus(status));
-                }
-
-                @Override
-                public void onError(String error) {
-                    Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT).show();
-                }
-            });
-            PanicManager.getInstance(SettingsUtils.getPanicSource(this), true).toggle(this);
-        }
-    }
-
-    private boolean isPanicOn() {
-        if (isPaniqueQuickServiceRunning()) {
-            return PaniqueQuick.getInstance().getPanicStatus();
-        } else {
-            return PanicManager.getInstance(SettingsUtils.getPanicSource(this), true).getStatus();
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu,menu);
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
     }
 
@@ -202,22 +152,31 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_help:
-                Toast.makeText(this,"TODO: Mostrar tela de ajuda.",Toast.LENGTH_LONG).show();
+                initHelp();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void initHelp() {
+        Intent intent = new Intent(MainActivity.this, HelpActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.nav_recordings:
-                Toast.makeText(this,"Clicou no Gravações",Toast.LENGTH_SHORT).show();
-                break;
+//            case R.id.nav_recordings:
+//                Toast.makeText(this,"Clicou no Gravações",Toast.LENGTH_SHORT).show();
+//                break;
             case R.id.nav_settings:
-                Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.nav_help:
+                initHelp();
+                break;
+
         }
         binding.getRoot().closeDrawer(GravityCompat.START);
 

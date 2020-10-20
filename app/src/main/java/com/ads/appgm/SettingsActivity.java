@@ -9,9 +9,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
+import androidx.preference.SwitchPreferenceCompat;
 
 import com.ads.appgm.databinding.SettingsActivityBinding;
-import com.ads.appgm.dialog.PermissionDialog;
+import com.ads.appgm.dialog.DisablePanicQuickDialog;
+import com.ads.appgm.service.PaniqueQuick;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -24,7 +26,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(binding.settings.getId(), new SettingsFragment(this))
+                .replace(binding.settings.getId(), SettingsFragment.newInstance(this))
                 .commit();
         setSupportActionBar(binding.settingsToolbar.getRoot());
         ActionBar actionBar = getSupportActionBar();
@@ -35,9 +37,16 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
-        private AppCompatActivity activity;
+        private SettingsActivity activity;
 
-        public SettingsFragment(SettingsActivity settingsActivity) {
+        public static SettingsFragment newInstance(SettingsActivity activity) {
+            return new SettingsFragment(activity);
+        }
+
+        public SettingsFragment() {
+        }
+
+        private SettingsFragment(SettingsActivity settingsActivity) {
             this.activity = settingsActivity;
         }
 
@@ -51,10 +60,11 @@ public class SettingsActivity extends AppCompatActivity {
             SharedPreferences pm = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
             switch (preference.getKey()) {
                 case "panic_quick":
+                    adjustPanicSwitch();
                     openAccessibilitySettings(pm.getBoolean("panic_quick", false));
-
+                    break;
             }
-            return super.onPreferenceTreeClick(preference);
+            return true;
         }
 
         public void openAccessibilitySettings(boolean isChecked) {
@@ -67,8 +77,29 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         private void showDialogPermission() {
-            PermissionDialog permissionDialog = new PermissionDialog();
+            DisablePanicQuickDialog permissionDialog = new DisablePanicQuickDialog();
             permissionDialog.show(activity.getFragmentManager(), "Permission Dialog");
+        }
+
+        private boolean isPaniqueQuickServiceRunning() {
+            return PaniqueQuick.getInstance() != null;
+        }
+
+        @Override
+        public void onResume() {
+            adjustPanicSwitch();
+            super.onResume();
+        }
+
+        private void adjustPanicSwitch() {
+            SwitchPreferenceCompat panic = findPreference("panic_quick");
+            if (panic != null) {
+                if (isPaniqueQuickServiceRunning()) {
+                    panic.setChecked(true);
+                } else {
+                    panic.setChecked(false);
+                }
+            }
         }
     }
 }

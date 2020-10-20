@@ -1,21 +1,3 @@
-/*
- *     Copyright (C) 2016  Merbin J Anselm <merbinjanselm@gmail.com>
- *
- *     This program is free software; you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation; either version 2 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License along
- *     with this program; if not, write to the Free Software Foundation, Inc.,
- *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
 package com.ads.appgm.dialog;
 
 import android.app.DialogFragment;
@@ -31,25 +13,22 @@ import android.widget.TextView;
 
 import com.ads.appgm.R;
 
-/**
- * Created by anselm94 on 8/12/15.
- */
-public class PermissionDialog extends DialogFragment implements View.OnClickListener {
+public class EnablePanicQuickDialog extends DialogFragment implements View.OnClickListener {
 
     View rootView;
     TextView tvPermissionNote, tvPermissionEnable, tvPermissionLater, tvPermissionDetailed;
 
-    public PermissionDialog() {
+    public EnablePanicQuickDialog() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.dialog_permission, container, false);
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        tvPermissionNote = (TextView) rootView.findViewById(R.id.tv_permission_note);
-        tvPermissionEnable = (TextView) rootView.findViewById(R.id.tv_permission_enable);
-        tvPermissionLater = (TextView) rootView.findViewById(R.id.tv_permission_later);
-        tvPermissionDetailed = (TextView) rootView.findViewById(R.id.tv_permission_detail);
+        tvPermissionNote = rootView.findViewById(R.id.tv_permission_note);
+        tvPermissionEnable = rootView.findViewById(R.id.tv_permission_enable);
+        tvPermissionLater = rootView.findViewById(R.id.tv_permission_later);
+        tvPermissionDetailed = rootView.findViewById(R.id.tv_permission_detail);
 
         tvPermissionDetailed.setMovementMethod(LinkMovementMethod.getInstance());
         tvPermissionNote.setMovementMethod(LinkMovementMethod.getInstance());
@@ -69,7 +48,7 @@ public class PermissionDialog extends DialogFragment implements View.OnClickList
 
         } else if (v == tvPermissionLater) {
             Handler mHandler = new Handler();
-            mHandler.postDelayed(() -> dismiss(), 350L);
+            mHandler.postDelayed(this::dismiss, 350L);
         }
     }
 
