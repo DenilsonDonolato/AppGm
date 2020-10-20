@@ -72,8 +72,7 @@ public class LocationUpdate extends JobService {
             }
         };
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
+        locationRequest.setInterval(1000*60*5);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         client.requestLocationUpdates(locationRequest,
@@ -87,6 +86,7 @@ public class LocationUpdate extends JobService {
                 Toast.makeText(getApplicationContext(), "Enviou GPS", Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText( getApplicationContext() , "Erro " + response.code(), Toast.LENGTH_LONG).show();
+                stopSelf();
             }
         }
 
@@ -96,6 +96,7 @@ public class LocationUpdate extends JobService {
             if (!call.isCanceled()) {
                 call.cancel();
             }
+            stopSelf();
         }
     };
     @Override
