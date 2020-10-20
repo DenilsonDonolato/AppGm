@@ -60,6 +60,12 @@
             <!-- Any inner elements would go here. -->
         </service>
 
+        <service android:name=".LocationUpdate"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+
+
         <receiver android:name=".receiver.BootReadyReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
