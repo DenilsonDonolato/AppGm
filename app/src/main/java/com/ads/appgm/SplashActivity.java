@@ -103,6 +103,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void goToMainActivity() {
+        LocationUpdate.iniciarTemporizador(getApplicationContext());
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
         finish();
