@@ -102,7 +102,7 @@ public class ButtonPanic implements View.OnClickListener {
         List<Double> position = new ArrayList<>();
         position.add(location.getLatitude());
         position.add(location.getLongitude());
-        com.ads.appgm.model.Location location1 = new com.ads.appgm.model.Location(position);
+        com.ads.appgm.model.Location location1 = new com.ads.appgm.model.Location(position, true);
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
         Call<Void> call = client.postLocation(location1, sp.getString(Constants.USER_TOKEN, ""));
         call.enqueue(responseCallback);

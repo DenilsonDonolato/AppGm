@@ -3,7 +3,6 @@ package com.ads.appgm.manager.device.output;
 import android.content.Context;
 
 import com.ads.appgm.manager.device.Device;
-import com.ads.appgm.util.Constants;
 
 public abstract class OutputDevice extends Device {
 

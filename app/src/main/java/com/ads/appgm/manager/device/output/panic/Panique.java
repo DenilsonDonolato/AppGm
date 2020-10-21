@@ -2,7 +2,6 @@ package com.ads.appgm.manager.device.output.panic;
 
 import android.content.Context;
 
-import com.ads.appgm.manager.device.output.panic.Panic;
 import com.ads.appgm.util.Constants;
 
 public abstract class Panique extends Panic {

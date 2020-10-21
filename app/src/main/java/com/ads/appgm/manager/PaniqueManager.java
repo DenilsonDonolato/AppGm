@@ -1,11 +1,9 @@
 package com.ads.appgm.manager;
 
 import android.content.Context;
-import android.preference.PreferenceManager;
 
 import androidx.media.VolumeProviderCompat;
 
-import com.ads.appgm.R;
 import com.ads.appgm.manager.device.input.event.VolumeKeyEvent;
 import com.ads.appgm.util.SettingsUtils;
 

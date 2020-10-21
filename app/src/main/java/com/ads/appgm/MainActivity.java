@@ -17,8 +17,8 @@ import androidx.core.view.GravityCompat;
 
 import com.ads.appgm.clickListeners.ButtonPanic;
 import com.ads.appgm.databinding.ActivityMainBinding;
-import com.ads.appgm.manager.PanicManager;
 import com.ads.appgm.help.HelpActivity;
+import com.ads.appgm.manager.PanicManager;
 import com.ads.appgm.manager.PaniqueManagerListener;
 import com.ads.appgm.manager.device.output.OutputDeviceListener;
 import com.ads.appgm.service.PaniqueQuick;

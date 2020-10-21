@@ -10,12 +10,11 @@ public class Location {
     @NonNull
     private List<Double> position;
 
-    public Location() {
-        this.position = new ArrayList<>();
-    }
+    private boolean panic;
 
-    public Location(@NonNull List<Double> position) {
+    public Location(@NonNull List<Double> position, boolean panic) {
         this.position = position;
+        this.panic = panic;
     }
 
     @NonNull
@@ -25,5 +24,13 @@ public class Location {
 
     public void setPosition(@NonNull List<Double> position) {
         this.position = position;
+    }
+
+    public boolean isPanic() {
+        return panic;
+    }
+
+    public void setPanic(boolean panic) {
+        this.panic = panic;
     }
 }
