@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     @Override
     protected void onResume() {
+        LocationUpdate.iniciarTemporizador(getApplicationContext());
         super.onResume();
         if (this.isPaniqueQuickServiceRunning()) {
             PaniqueQuick.getInstance().registerPaniqueManagerListener(this);
