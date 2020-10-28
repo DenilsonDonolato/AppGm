@@ -21,7 +21,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://url.back-end.com/\"")
         }
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://e904861a9ccf.ngrok.io\"")
+            buildConfigField("String", "BASE_URL", "\"https://337923977eaa.ngrok.io\"")
         }
     }
 
@@ -62,6 +62,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'com.synnapps:carouselview:0.1.5'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     implementation "androidx.work:work-runtime:$work_version"
     implementation "androidx.work:work-gcm:$work_version"
 

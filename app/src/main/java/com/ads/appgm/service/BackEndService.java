@@ -1,6 +1,6 @@
 package com.ads.appgm.service;
 
-import com.ads.appgm.model.Location;
+import com.ads.appgm.model.MyLocation;
 import com.ads.appgm.model.Login;
 import com.ads.appgm.model.LoginResponse;
 
@@ -15,5 +15,5 @@ public interface BackEndService {
     Call<LoginResponse> loginRequest(@Body Login login);
 
     @POST("mobile/localization")
-    Call<Void> postLocation(@Body Location location, @Header("Authorization") String token);
+    Call<Void> postLocation(@Body MyLocation myLocation, @Header("Authorization") String token);
 }

@@ -5,14 +5,14 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Location {
+public class MyLocation {
 
     @NonNull
     private List<Double> position;
 
     private boolean panic;
 
-    public Location(@NonNull List<Double> position, boolean panic) {
+    public MyLocation(@NonNull List<Double> position, boolean panic) {
         this.position = position;
         this.panic = panic;
     }

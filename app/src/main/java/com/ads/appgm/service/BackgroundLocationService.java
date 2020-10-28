@@ -1,4 +1,4 @@
-package com.ads.appgm;
+package com.ads.appgm.service;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,14 +15,12 @@ import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.ads.appgm.service.BackEndService;
-import com.ads.appgm.service.HttpClient;
+import com.ads.appgm.model.MyLocation;
 import com.ads.appgm.util.Constants;
 import com.ads.appgm.util.SharedPreferenceUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.Task;
 
@@ -34,13 +32,13 @@ import java.util.concurrent.TimeUnit;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class LocationUpdate extends Worker {
+public class BackgroundLocationService extends Worker {
 
     private static final String TAG = "com.ads.appgm.NotPanicUpdates";
     private final Handler mMainThreadHandler = new Handler(Looper.getMainLooper());
     private CancellationTokenSource cancellationToken;
 
-    public LocationUpdate(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+    public BackgroundLocationService(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
 
@@ -48,7 +46,7 @@ public class LocationUpdate extends Worker {
 
         WorkManager wm = WorkManager.getInstance(context);
         PeriodicWorkRequest pwr = new PeriodicWorkRequest
-                .Builder(LocationUpdate.class,
+                .Builder(BackgroundLocationService.class,
                 1, TimeUnit.HOURS,
                 15, TimeUnit.MINUTES)
                 .build();
@@ -81,9 +79,9 @@ public class LocationUpdate extends Worker {
             List<Double> position = new ArrayList<>();
             position.add(location.getLatitude());
             position.add(location.getLongitude());
-            com.ads.appgm.model.Location location1 = new com.ads.appgm.model.Location(position, false);
+            MyLocation myLocation = new MyLocation(position, false);
             SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
-            Call<Void> call = backEndService.postLocation(location1, sp.getString(Constants.USER_TOKEN, ""));
+            Call<Void> call = backEndService.postLocation(myLocation, sp.getString(Constants.USER_TOKEN, ""));
             try {
                 Response<Void> response = call.execute();
                 if (response.code() == 200) {
@@ -109,7 +107,7 @@ public class LocationUpdate extends Worker {
 
     @Override
     public void onStopped() {
-        Log.e("JOB", "Location Updates Cancelado");
+        Log.e("JOB", "MyLocation Updates Cancelado");
         if (cancellationToken != null) {
             cancellationToken.cancel();
         }

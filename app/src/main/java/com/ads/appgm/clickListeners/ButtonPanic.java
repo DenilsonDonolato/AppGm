@@ -13,9 +13,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
+import com.ads.appgm.MainActivity;
 import com.ads.appgm.R;
+import com.ads.appgm.model.MyLocation;
 import com.ads.appgm.notification.Notification;
 import com.ads.appgm.service.BackEndService;
+import com.ads.appgm.service.ForegroundLocationService;
 import com.ads.appgm.service.HttpClient;
 import com.ads.appgm.util.Constants;
 import com.ads.appgm.util.SharedPreferenceUtil;
@@ -34,18 +37,17 @@ import retrofit2.Response;
 
 public class ButtonPanic implements View.OnClickListener {
 
-    private final Activity activity;
-    private FusedLocationProviderClient fusedLocationProviderClient;
+    private final MainActivity activity;
+    private final FusedLocationProviderClient fusedLocationProviderClient;
     private LocationCallback locationCallback;
 
-    public ButtonPanic(Activity activity) {
+    public ButtonPanic(MainActivity activity) {
         this.fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity);
         this.activity = activity;
     }
 
     @Override
     public void onClick(View v) {
-
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
         boolean isActive = sp.getBoolean(Constants.PANIC, false);
         if (isActive) {
@@ -53,7 +55,9 @@ public class ButtonPanic implements View.OnClickListener {
             notificationManager.cancel(1);
             sp.edit().putBoolean(Constants.PANIC, false).apply();
             v.setBackground(ContextCompat.getDrawable(activity.getBaseContext(), R.drawable.custom_button_inactive));
+            activity.getForegroundLocationService().removeLocationUpdates();
         } else {
+            activity.getForegroundLocationService().requestLocationUpdates();
             sp.edit().putBoolean(Constants.PANIC, true).apply();
             v.setBackground(ContextCompat.getDrawable(activity.getBaseContext(), R.drawable.custom_button_active));
             if (ActivityCompat.checkSelfPermission(v.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -102,9 +106,9 @@ public class ButtonPanic implements View.OnClickListener {
         List<Double> position = new ArrayList<>();
         position.add(location.getLatitude());
         position.add(location.getLongitude());
-        com.ads.appgm.model.Location location1 = new com.ads.appgm.model.Location(position, true);
+        MyLocation myLocation = new MyLocation(position, true);
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
-        Call<Void> call = client.postLocation(location1, sp.getString(Constants.USER_TOKEN, ""));
+        Call<Void> call = client.postLocation(myLocation, sp.getString(Constants.USER_TOKEN, ""));
         call.enqueue(responseCallback);
     }
 

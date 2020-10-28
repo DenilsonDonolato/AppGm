@@ -16,6 +16,7 @@ public class SettingsUtils {
     private static final String PREF_SCREEN_LOCK = "pref_screen_lock";
     private static final String PREF_SCREEN_OFF = "pref_screen_off_timeout";
     private static final String PREF_PROXIMITY = "pref_proximity";
+    public static final String KEY_REQUESTING_LOCATION_UPDATES = "requesting_location_updates";
 
     public static boolean isFirstTime(final Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
@@ -75,5 +76,17 @@ public class SettingsUtils {
     public static boolean isVibrateEnabled(final Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         return sp.getBoolean(SettingsUtils.PREF_VIBRATE, context.getResources().getBoolean(R.bool.pref_default_vibrate));
+    }
+
+    public static boolean requestingLocationUpdates(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(KEY_REQUESTING_LOCATION_UPDATES, false);
+    }
+
+    public static void setRequestingLocationUpdates(Context context, boolean requestingLocationUpdates) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putBoolean(KEY_REQUESTING_LOCATION_UPDATES, requestingLocationUpdates)
+                .apply();
     }
 }

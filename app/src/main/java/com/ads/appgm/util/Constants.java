@@ -33,6 +33,7 @@ public class Constants {
     public static final String USER_NAME = "USER_NAME";
     public static final String EXPIRATION_DATE = "EXPIRATION_DATE";
     public static final String PANIC = "panicActive";
+    public final static int FOREGROUND_NOTIFICATION_ID = 123;
 
     public final static String ID_DEVICE_OUTPUT = "1";
     public final static String ID_DEVICE_OUTPUT_PANIC = "10";
