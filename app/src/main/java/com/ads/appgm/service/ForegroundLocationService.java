@@ -6,8 +6,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Binder;
@@ -17,6 +19,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -24,13 +27,22 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.ads.appgm.R;
 import com.ads.appgm.SplashActivity;
+import com.ads.appgm.model.MyLocation;
 import com.ads.appgm.util.Constants;
 import com.ads.appgm.util.SettingsUtils;
+import com.ads.appgm.util.SharedPreferenceUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ForegroundLocationService extends Service {
     private static final String PACKAGE_NAME =
@@ -53,7 +65,7 @@ public class ForegroundLocationService extends Service {
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
     private NotificationManager notificationManager;
-    private Location location;
+    private Location mLocation;
     private Handler serviceHandler;
     private boolean changingConfiguration = false;
 
@@ -192,7 +204,7 @@ public class ForegroundLocationService extends Service {
             fusedLocationProviderClient.getLastLocation()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful() && task.getResult() != null) {
-                            location = task.getResult();
+                            mLocation = task.getResult();
                         } else {
                             Log.w(TAG, "Failed to get location.");
                         }
@@ -205,7 +217,7 @@ public class ForegroundLocationService extends Service {
     private void onNewLocation(Location location) {
         Log.i(TAG, "New location: " + location);
 
-        this.location = location;
+        mLocation = location;
 
         // Notify anyone listening for broadcasts about the new location.
         Intent intent = new Intent(ACTION_BROADCAST);
@@ -213,9 +225,18 @@ public class ForegroundLocationService extends Service {
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 
         // Update notification content if running as a foreground service.
-        if (serviceIsRunningInForeground(this)) {
-            notificationManager.notify(NOTIFICATION_ID, getNotification());
-        }
+//        if (serviceIsRunningInForeground(this)) {
+//            notificationManager.notify(NOTIFICATION_ID, getNotification());
+//        }
+
+        BackEndService client = HttpClient.getInstance();
+        List<Double> position = new ArrayList<>();
+        position.add(location.getLatitude());
+        position.add(location.getLongitude());
+        MyLocation myLocation = new MyLocation(position, true);
+        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        Call<Void> call = client.postLocation(myLocation, sp.getString(Constants.USER_TOKEN, ""));
+        call.enqueue(responseCallback);
     }
 
     private void createLocationRequest() {
@@ -245,4 +266,23 @@ public class ForegroundLocationService extends Service {
         }
         return false;
     }
+
+    Callback<Void> responseCallback = new Callback<Void>() {
+        @Override
+        public void onResponse(Call<Void> call, Response<Void> response) {
+            if (response.code() == 200) {
+                Toast.makeText(getApplicationContext(), "Enviou GPS", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Erro " + response.code(), Toast.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        public void onFailure(Call<Void> call, Throwable t) {
+            Toast.makeText(getApplicationContext(), "Erro " + t.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+            if (!call.isCanceled()) {
+                call.cancel();
+            }
+        }
+    };
 }
