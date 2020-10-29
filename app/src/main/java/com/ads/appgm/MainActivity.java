@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
-    private MyReceiver myReceiver;
     private ForegroundLocationService foregroundLocationService = null;
     private boolean serviceBound = false;
 
@@ -87,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         binding.textViewName.setText(getUserName(sp));
         setButtonPanicState(sp);
 
-        myReceiver = new MyReceiver();
         setSupportActionBar(binding.toolbar.getRoot());
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.getRoot(), binding.toolbar.getRoot(),
                 R.string.open_drawer, R.string.close_drawer);
@@ -168,8 +166,6 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         PanicManager.getInstance(true).setListener(this);
         setButtonPanicState(SharedPreferenceUtil.getSharedePreferences());
         instance = this;
-        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver,
-                new IntentFilter(ForegroundLocationService.ACTION_BROADCAST));
     }
 
     @Override
@@ -179,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         }
         PanicManager.getInstance(true).setListener(null);
         instance = null;
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver);
         super.onPause();
     }
 
@@ -257,42 +252,6 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
             }
         }
     }
-
-    private class MyReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Location location = intent.getParcelableExtra(ForegroundLocationService.EXTRA_LOCATION);
-            if (location != null) {
-                BackEndService client = HttpClient.getInstance();
-                List<Double> position = new ArrayList<>();
-                position.add(location.getLatitude());
-                position.add(location.getLongitude());
-                MyLocation myLocation = new MyLocation(position, true);
-                SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
-                Call<Void> call = client.postLocation(myLocation, sp.getString(Constants.USER_TOKEN, ""));
-                call.enqueue(responseCallback);
-            }
-        }
-    }
-
-    Callback<Void> responseCallback = new Callback<Void>() {
-        @Override
-        public void onResponse(Call<Void> call, Response<Void> response) {
-            if (response.code() == 200) {
-                Toast.makeText(getApplicationContext(), "Enviou GPS", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(getApplicationContext(), "Erro " + response.code(), Toast.LENGTH_LONG).show();
-            }
-        }
-
-        @Override
-        public void onFailure(Call<Void> call, Throwable t) {
-            Toast.makeText(getApplicationContext(), "Erro " + t.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-            if (!call.isCanceled()) {
-                call.cancel();
-            }
-        }
-    };
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
