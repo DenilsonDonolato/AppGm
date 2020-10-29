@@ -21,7 +21,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://url.back-end.com/\"")
         }
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://337923977eaa.ngrok.io\"")
+            buildConfigField("String", "BASE_URL", "\"https://62bbb7fe36dd.ngrok.io\"")
         }
     }
 
@@ -63,6 +63,7 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'com.synnapps:carouselview:0.1.5'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+    implementation 'com.github.kaknazaveshtakipishi:PermissionEverywhere:1.0.2'
     implementation "androidx.work:work-runtime:$work_version"
     implementation "androidx.work:work-gcm:$work_version"
 

@@ -52,7 +52,7 @@ public class ButtonPanic implements View.OnClickListener {
         boolean isActive = sp.getBoolean(Constants.PANIC, false);
         if (isActive) {
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(activity.getApplicationContext());
-            notificationManager.cancel(1);
+            notificationManager.cancelAll();
             sp.edit().putBoolean(Constants.PANIC, false).apply();
             v.setBackground(ContextCompat.getDrawable(activity.getBaseContext(), R.drawable.custom_button_inactive));
             activity.getForegroundLocationService().removeLocationUpdates();
