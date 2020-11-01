@@ -51,7 +51,9 @@ public class Panique2 extends Panique {
         }
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            //TODO ask permission?
+            MyNotification myNotification = MyNotification.getInstance(context);
+            myNotification.createNotificationChannel();
+            myNotification.openApp(context);
             return;
         }
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {

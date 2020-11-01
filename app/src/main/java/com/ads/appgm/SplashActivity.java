@@ -51,12 +51,6 @@ public class SplashActivity extends AppCompatActivity {
         //Caso inválido usar sp.putLong(Constants.USER,0);
 
         validLogin = sp.getLong(Constants.USER_ID, 0) != 0;
-//        //TODO: Remover para produção
-//        validLogin = true;
-//        sp.edit().putString(Constants.USER_TOKEN, "token")
-//                .putLong(Constants.USER_ID, 1)
-//                .putString(Constants.USER_NAME, "Viviane Ogata")
-//                .apply();
     }
 
     private void createDialogs() {
