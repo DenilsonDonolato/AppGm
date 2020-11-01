@@ -1,6 +1,5 @@
 package com.ads.appgm.dialog;
 
-import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,7 +10,10 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.TextView;
 
+import androidx.fragment.app.DialogFragment;
+
 import com.ads.appgm.R;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 public class EnablePanicQuickDialog extends DialogFragment implements View.OnClickListener {
 
@@ -24,7 +26,11 @@ public class EnablePanicQuickDialog extends DialogFragment implements View.OnCli
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.dialog_permission, container, false);
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        try {
+            requireDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        } catch (IllegalStateException e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
         tvPermissionNote = rootView.findViewById(R.id.tv_permission_note);
         tvPermissionEnable = rootView.findViewById(R.id.tv_permission_enable);
         tvPermissionLater = rootView.findViewById(R.id.tv_permission_later);

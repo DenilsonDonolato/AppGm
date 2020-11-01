@@ -3,10 +3,6 @@ package com.ads.appgm.service;
 import android.Manifest;
 import android.app.ActivityManager;
 import android.app.Dialog;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,7 +12,6 @@ import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -27,13 +22,13 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.ads.appgm.R;
-import com.ads.appgm.SplashActivity;
 import com.ads.appgm.model.MyLocation;
 import com.ads.appgm.util.Constants;
+import com.ads.appgm.util.MyNotification;
+import com.ads.appgm.util.MyPermission;
 import com.ads.appgm.util.SettingsUtils;
 import com.ads.appgm.util.SharedPreferenceUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -42,6 +37,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.permissioneverywhere.PermissionEverywhere;
+import com.permissioneverywhere.PermissionResultCallback;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -53,27 +49,15 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ForegroundLocationService extends Service {
-    private static final String PACKAGE_NAME =
-            "com.ads.appgm.service.foregroundlocationservice";
-    public static final String ACTION_BROADCAST = PACKAGE_NAME + ".broadcast";
-    public static final String EXTRA_LOCATION = PACKAGE_NAME + ".location";
-
-    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
-    private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
-            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 
     private static final String TAG = ForegroundLocationService.class.getSimpleName();
-    private static final String CHANNEL_ID = "foreground_location";
-    private static final String EXTRA_STARTED_FROM_NOTIFICATION = PACKAGE_NAME +
-            ".started_from_notification";
-    private static final int NOTIFICATION_ID = Constants.FOREGROUND_NOTIFICATION_ID;
 
     private final IBinder mBinder = new LocalBinder();
     private FusedLocationProviderClient fusedLocationProviderClient;
     private LocationManager locationManager;
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
-    private NotificationManager notificationManager;
+    private MyNotification myNotification;
     private Location location;
     private Handler serviceHandler;
     private boolean changingConfiguration = false;
@@ -92,7 +76,7 @@ public class ForegroundLocationService extends Service {
             }
         };
 
-        locationManager = (LocationManager) getSystemService(Activity.LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         createLocationRequest();
         getLastLocation();
@@ -100,22 +84,13 @@ public class ForegroundLocationService extends Service {
         HandlerThread handlerThread = new HandlerThread(TAG);
         handlerThread.start();
         serviceHandler = new Handler(handlerThread.getLooper());
-        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.app_name);
-            // Create the channel for the notification
-            NotificationChannel mChannel =
-                    new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
-
-            // Set the Notification Channel for the Notification Manager.
-            notificationManager.createNotificationChannel(mChannel);
-        }
+        myNotification = MyNotification.getInstance(getApplicationContext());
+        myNotification.createNotificationChannel();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        boolean startedFromNotification = intent.getBooleanExtra(EXTRA_STARTED_FROM_NOTIFICATION,
+        boolean startedFromNotification = intent.getBooleanExtra(Constants.EXTRA_STARTED_FROM_NOTIFICATION,
                 false);
 
         // We got here because the user decided to remove location updates from the notification.
@@ -156,14 +131,14 @@ public class ForegroundLocationService extends Service {
         if (!changingConfiguration && SettingsUtils.requestingLocationUpdates(this)) {
 //            Log.i(TAG, "Starting foreground service");
 
-            startForeground(NOTIFICATION_ID, getNotification());
+            startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE, myNotification.foregroundNotification(getApplicationContext()));
         }
         return true; // Ensures onRebind() is called when a client re-binds.
     }
 
     @Override
     public void onDestroy() {
-        notificationManager.cancelAll();
+        myNotification.cancel(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE);
         serviceHandler.removeCallbacksAndMessages(null);
     }
 
@@ -182,23 +157,7 @@ public class ForegroundLocationService extends Service {
         startService(new Intent(getApplicationContext(), ForegroundLocationService.class));
         try {
             if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                CharSequence text = getText(R.string.app_name);
-                Intent intent = new Intent(getApplicationContext(), ForegroundLocationService.class);
-                PendingIntent servicePendingIntent = PendingIntent.getService(getApplicationContext(), 0, intent,
-                        PendingIntent.FLAG_UPDATE_CURRENT);
-                PendingIntent turnOnGps = PendingIntent.getActivity(getApplicationContext(), 0,
-                        new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
-                Notification notification = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-                        .addAction(R.drawable.ic_launch, "Ligar GPS", turnOnGps)
-                        .addAction(R.drawable.ic_cancel, "Cancelar", servicePendingIntent)
-                        .setContentText(text)
-                        .setContentTitle("SOS Maria precisa ler sua localização")
-                        .setOngoing(true)
-                        .setPriority(Notification.PRIORITY_HIGH)
-                        .setSmallIcon(R.mipmap.ic_launcher_round)
-                        .setTicker(text)
-                        .build();
-                notificationManager.notify(Constants.FOREGROUND_NOTIFICATION_ID,notification);
+                myNotification.turnOnGps(getApplicationContext());
                 SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
                 sp.edit().putBoolean(Constants.PANIC,false).apply();
             }
@@ -211,7 +170,7 @@ public class ForegroundLocationService extends Service {
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
                             Manifest.permission.ACCESS_FINE_LOCATION},
                     Constants.GPS_PERMISSION_REQUEST,
-                    "Notification title",
+                    "MyNotification title",
                     "This app needs a write permission",
                     R.mipmap.ic_launcher)
                     .enqueue(permissionResponse -> {
@@ -236,7 +195,7 @@ public class ForegroundLocationService extends Service {
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
                             Manifest.permission.ACCESS_FINE_LOCATION},
                     Constants.GPS_PERMISSION_REQUEST,
-                    "Notification title",
+                    "MyNotification title",
                     "This app needs a write permission",
                     R.mipmap.ic_launcher)
                     .enqueue(permissionResponse -> {
@@ -249,34 +208,6 @@ public class ForegroundLocationService extends Service {
         }
     }
 
-    private Notification getNotification() {
-        Intent intent = new Intent(this, ForegroundLocationService.class);
-
-        CharSequence text = getText(R.string.app_name);
-
-        // Extra to help us figure out if we arrived in onStartCommand via the notification or not.
-        intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);
-
-        // The PendingIntent that leads to a call to onStartCommand() in this service.
-        PendingIntent servicePendingIntent = PendingIntent.getService(this, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // The PendingIntent to launch activity.
-        PendingIntent activityPendingIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, SplashActivity.class), 0);
-
-        return new NotificationCompat.Builder(this, CHANNEL_ID)
-                .addAction(R.drawable.ic_launch, "Abrir app", activityPendingIntent)
-                .addAction(R.drawable.ic_cancel, "Cancelar", servicePendingIntent)
-                .setContentText(text)
-                .setContentTitle("Sua encomenda está a caminho")
-                .setOngoing(true)
-                .setPriority(Notification.PRIORITY_HIGH)
-                .setSmallIcon(R.mipmap.ic_launcher_round)
-                .setTicker(text)
-                .build();
-    }
-
     private void getLastLocation() {
         try {
             fusedLocationProviderClient.getLastLocation()
@@ -284,7 +215,7 @@ public class ForegroundLocationService extends Service {
                         if (task.isSuccessful() && task.getResult() != null) {
                             location = task.getResult();
                         } else {
-                            Log.w(TAG, "Failed to get location.");
+                            Log.e(TAG, "Failed to get location.");
                         }
                     })
                     .addOnFailureListener(e -> {
@@ -297,31 +228,27 @@ public class ForegroundLocationService extends Service {
                     });
         } catch (SecurityException unlikely) {
             Log.e(TAG, "Lost location permission." + unlikely);
-            PermissionEverywhere.getPermission(getApplicationContext(),
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                            Manifest.permission.ACCESS_FINE_LOCATION},
-                    Constants.GPS_PERMISSION_REQUEST,
-                    "Notification title",
-                    "This app needs a write permission",
-                    R.mipmap.ic_launcher)
-                    .enqueue(permissionResponse -> {
-                        if (permissionResponse.isGranted()) {
-                            getLastLocation();
-                        } else {
-                            stopSelf();
-                        }
-                    });
+            MyPermission myPermission = MyPermission.getInstance();
+            myPermission.requestGPS(getApplicationContext(), permissionResultCallback);
         }
     }
 
+    private final PermissionResultCallback permissionResultCallback = permissionResponse -> {
+        if (permissionResponse.isGranted()) {
+            ForegroundLocationService.this.getLastLocation();
+        } else {
+            ForegroundLocationService.this.stopSelf();
+        }
+    };
+
     private void onNewLocation(Location location) {
-        Log.i(TAG, "New location: " + location);
+        Log.e(TAG, "New location: " + location);
 
         this.location = location;
 
         // Notify anyone listening for broadcasts about the new location.
-        Intent intent = new Intent(ACTION_BROADCAST);
-        intent.putExtra(EXTRA_LOCATION, location);
+        Intent intent = new Intent(Constants.ACTION_BROADCAST);
+        intent.putExtra(Constants.EXTRA_LOCATION, location);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 
         sendLocationToBackEnd();
@@ -333,7 +260,7 @@ public class ForegroundLocationService extends Service {
 
     private void sendLocationToBackEnd() {
         BackEndService client = HttpClient.getInstance();
-        List<Double> position = new ArrayList<>();
+        List<Double> position = new ArrayList<>(2);
         position.add(location.getLatitude());
         position.add(location.getLongitude());
         MyLocation myLocation = new MyLocation(position, true);
@@ -363,9 +290,9 @@ public class ForegroundLocationService extends Service {
 
     private void createLocationRequest() {
         locationRequest = new LocationRequest();
-        locationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-        locationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
-//        locationRequest.setSmallestDisplacement(10);
+        locationRequest.setInterval(Constants.UPDATE_INTERVAL_IN_MILLISECONDS);
+        locationRequest.setFastestInterval(Constants.FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+        locationRequest.setSmallestDisplacement(Constants.SMALLEST_DISPLACEMENT);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 

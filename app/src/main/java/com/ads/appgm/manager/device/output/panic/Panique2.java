@@ -12,8 +12,8 @@ import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
-import com.ads.appgm.notification.Notification;
 import com.ads.appgm.util.Constants;
+import com.ads.appgm.util.MyNotification;
 import com.ads.appgm.util.SharedPreferenceUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -45,8 +45,8 @@ public class Panique2 extends Panique {
     private void panic() {
         LocationManager lm = (LocationManager) context.getSystemService(Activity.LOCATION_SERVICE);
         if (lm == null || !lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            Notification notification = new Notification(context);
-            notification.show("GPS Desligado", "Ligar o GPS para o funcionamento correto do App", 1);
+            MyNotification myNotification = MyNotification.getInstance(context);
+            myNotification.turnOnGps(context);
             return;
         }
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -83,9 +83,9 @@ public class Panique2 extends Panique {
     private void update(Context context, Location location) {
         Toast.makeText(context, "Botão do Pânico acionado, latitude: " + location.getLatitude() +
                 ", longitude: " + location.getLongitude(), Toast.LENGTH_LONG).show();
-        Notification notification = new Notification(context);
-        notification.show("Notificação 1", "Latitude: " + location.getLatitude() + "\n" +
-                "Longitude: " + location.getLongitude(), 1);
+        MyNotification myNotification = MyNotification.getInstance(context);
+        myNotification.show("Notificação 1", "Latitude: " + location.getLatitude() + "\n" +
+                "Longitude: " + location.getLongitude(), 1,context);
     }
 
     @Override

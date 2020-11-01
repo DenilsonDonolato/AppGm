@@ -1,16 +1,13 @@
 package com.ads.appgm;
 
 import android.Manifest;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,8 +25,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 
 import com.ads.appgm.clickListeners.ButtonPanic;
@@ -38,24 +33,14 @@ import com.ads.appgm.help.HelpActivity;
 import com.ads.appgm.manager.PanicManager;
 import com.ads.appgm.manager.PaniqueManagerListener;
 import com.ads.appgm.manager.device.output.OutputDeviceListener;
-import com.ads.appgm.model.MyLocation;
-import com.ads.appgm.service.BackEndService;
 import com.ads.appgm.service.BackgroundLocationService;
 import com.ads.appgm.service.ForegroundLocationService;
-import com.ads.appgm.service.HttpClient;
 import com.ads.appgm.service.PaniqueQuick;
 import com.ads.appgm.util.Constants;
 import com.ads.appgm.util.SettingsUtils;
 import com.ads.appgm.util.SharedPreferenceUtil;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 
 public class MainActivity extends AppCompatActivity implements PaniqueManagerListener,
@@ -105,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     private void setButtonPanicState(SharedPreferences sp) {
         boolean status = sp.getBoolean("panicActive", false);
-        if (isPaniqueQuickServiceRunning()) {
+        if (isPaniqueQuickServiceRunning() && PaniqueQuick.getInstance() != null) {
             status |= PaniqueQuick.getInstance().getPanicStatus();
         }
         togglePanic(status);
@@ -160,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     protected void onResume() {
         BackgroundLocationService.iniciarTemporizador(getApplicationContext());
         super.onResume();
-        if (this.isPaniqueQuickServiceRunning()) {
+        if (this.isPaniqueQuickServiceRunning() && PaniqueQuick.getInstance() != null) {
             PaniqueQuick.getInstance().registerPaniqueManagerListener(this);
         }
         PanicManager.getInstance(true).setListener(this);
@@ -170,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     @Override
     protected void onPause() {
-        if (this.isPaniqueQuickServiceRunning()) {
+        if (this.isPaniqueQuickServiceRunning() && PaniqueQuick.getInstance() != null) {
             PaniqueQuick.getInstance().unregisterPaniqueManagerListener();
         }
         PanicManager.getInstance(true).setListener(null);
@@ -206,11 +191,9 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
                     findViewById(R.id.activity_main),
                     "Precisa de GPS",
                     Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Ok", view -> {
-                        ActivityCompat.requestPermissions(MainActivity.this,
-                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                REQUEST_PERMISSIONS_REQUEST_CODE);
-                    })
+                    .setAction("Ok", view -> ActivityCompat.requestPermissions(MainActivity.this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            REQUEST_PERMISSIONS_REQUEST_CODE))
                     .show();
         } else {
             ActivityCompat.requestPermissions(MainActivity.this,

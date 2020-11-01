@@ -1,8 +1,8 @@
 package com.ads.appgm.service;
 
-import com.ads.appgm.model.MyLocation;
 import com.ads.appgm.model.Login;
 import com.ads.appgm.model.LoginResponse;
+import com.ads.appgm.model.MyLocation;
 
 import retrofit2.Call;
 import retrofit2.http.Body;

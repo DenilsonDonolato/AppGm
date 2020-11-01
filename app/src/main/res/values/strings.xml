@@ -30,6 +30,7 @@
     <string name="later">Mais tarde</string>
     <string name="enable">Ativar</string>
     <string name="reason_location">Para sua segurança este aplicativo precisa de permissão de localização o tempo todo.</string>
+    <string name="reason_location_rationale">Para sua segurança este aplicativo precisa de permissão de localização o tempo todo.\nPara permitir o uso da localização entre nas configurações do SOS Maria clique em permissões e permita o uso do Local</string>
     <string name="GPS">GPS</string>
     <string name="close">Fechar</string>
     <string name="turn_on_gps">Ativar GPS</string>

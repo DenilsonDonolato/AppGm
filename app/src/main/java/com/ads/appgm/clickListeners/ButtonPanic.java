@@ -1,7 +1,6 @@
 package com.ads.appgm.clickListeners;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -16,11 +15,10 @@ import androidx.core.content.ContextCompat;
 import com.ads.appgm.MainActivity;
 import com.ads.appgm.R;
 import com.ads.appgm.model.MyLocation;
-import com.ads.appgm.notification.Notification;
 import com.ads.appgm.service.BackEndService;
-import com.ads.appgm.service.ForegroundLocationService;
 import com.ads.appgm.service.HttpClient;
 import com.ads.appgm.util.Constants;
+import com.ads.appgm.util.MyNotification;
 import com.ads.appgm.util.SharedPreferenceUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -99,9 +97,9 @@ public class ButtonPanic implements View.OnClickListener {
     private void update(View v, Location location) {
         Toast.makeText(v.getContext(), "Botão do Pânico acionado, latitude: " + location.getLatitude() +
                 ", longitude: " + location.getLongitude(), Toast.LENGTH_LONG).show();
-        Notification notification = new Notification(v.getContext());
-        notification.show("Notificação 1", "Latitude: " + location.getLatitude() + "\n" +
-                "Longitude: " + location.getLongitude(), 1);
+        MyNotification myNotification = MyNotification.getInstance(v.getContext());
+        myNotification.show("Notificação 1", "Latitude: " + location.getLatitude() + "\n" +
+                "Longitude: " + location.getLongitude(), 1,v.getContext());
         BackEndService client = HttpClient.getInstance();
         List<Double> position = new ArrayList<>();
         position.add(location.getLatitude());

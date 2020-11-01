@@ -17,12 +17,10 @@ import com.ads.appgm.service.PaniqueQuick;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private SettingsActivityBinding binding;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = SettingsActivityBinding.inflate(getLayoutInflater());
+        com.ads.appgm.databinding.SettingsActivityBinding binding = SettingsActivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportFragmentManager()
                 .beginTransaction()
@@ -94,11 +92,7 @@ public class SettingsActivity extends AppCompatActivity {
         private void adjustPanicSwitch() {
             SwitchPreferenceCompat panic = findPreference("panic_quick");
             if (panic != null) {
-                if (isPaniqueQuickServiceRunning()) {
-                    panic.setChecked(true);
-                } else {
-                    panic.setChecked(false);
-                }
+                panic.setChecked(isPaniqueQuickServiceRunning());
             }
         }
     }

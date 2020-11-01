@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdkVersion 30
@@ -21,7 +23,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://url.back-end.com/\"")
         }
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://62bbb7fe36dd.ngrok.io\"")
+            buildConfigField("String", "BASE_URL", "\"https://b1d97c2fd879.ngrok.io\"")
         }
     }
 
@@ -46,6 +48,8 @@ dependencies {
     def work_version = "2.4.0"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation platform('com.google.firebase:firebase-bom:26.0.0')
+    implementation 'com.google.firebase:firebase-crashlytics'
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.2'

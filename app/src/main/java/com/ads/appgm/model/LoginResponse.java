@@ -5,14 +5,9 @@ public class LoginResponse {
     private String token;
     private long id;
     private String name;
+    private long measureId;
 
     public LoginResponse() {
-    }
-
-    public LoginResponse(String token, long id, String name) {
-        this.token = token;
-        this.id = id;
-        this.name = name;
     }
 
     public String getToken() {
@@ -37,5 +32,13 @@ public class LoginResponse {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public long getMeasureId() {
+        return measureId;
+    }
+
+    public void setMeasureId(long measureId) {
+        this.measureId = measureId;
     }
 }
