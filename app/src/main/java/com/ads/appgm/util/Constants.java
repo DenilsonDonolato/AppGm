@@ -49,6 +49,8 @@ public class Constants {
             UPDATE_INTERVAL_IN_MILLISECONDS / 2;
     public static final String EXTRA_STARTED_FROM_NOTIFICATION = PACKAGE_NAME +
             ".started_from_notification";
+    public static final String EXTRA_STARTED_FROM_PANICQUICK = PACKAGE_NAME +
+            ".started_from_panicquick";
     public static final float SMALLEST_DISPLACEMENT = 10;
 
     public final static String ID_DEVICE_OUTPUT = "1";

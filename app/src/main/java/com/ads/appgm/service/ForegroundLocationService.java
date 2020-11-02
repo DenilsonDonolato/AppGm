@@ -8,10 +8,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ServiceInfo;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -92,12 +94,34 @@ public class ForegroundLocationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         boolean startedFromNotification = intent.getBooleanExtra(Constants.EXTRA_STARTED_FROM_NOTIFICATION,
                 false);
+        boolean startedFromPanicQuick = intent.getBooleanExtra(Constants.EXTRA_STARTED_FROM_PANICQUICK, false);
 
         // We got here because the user decided to remove location updates from the notification.
         if (startedFromNotification) {
             removeLocationUpdates();
             stopSelf();
+            myNotification.cancel(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE);
         }
+
+        if (startedFromPanicQuick) {
+            if (intent.getBooleanExtra(Constants.PANIC, false)) {
+                Log.i(TAG, "Starting foreground service");
+                requestLocationUpdates();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE,
+                            myNotification.foregroundNotification(getApplicationContext()),
+                            ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
+                } else {
+                    startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE,
+                            myNotification.foregroundNotification(getApplicationContext()));
+                }
+            } else {
+                myNotification.cancel(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE);
+                removeLocationUpdates();
+                stopSelf();
+            }
+        }
+
         // Tells the system to not try to recreate the service after it has been killed.
         return START_NOT_STICKY;
     }
@@ -154,12 +178,12 @@ public class ForegroundLocationService extends Service {
 
     public void requestLocationUpdates() {
         SettingsUtils.setRequestingLocationUpdates(this, true);
-        startService(new Intent(getApplicationContext(), ForegroundLocationService.class));
+//        startService(new Intent(getApplicationContext(), ForegroundLocationService.class));
         try {
             if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 myNotification.turnOnGps(getApplicationContext());
                 SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
-                sp.edit().putBoolean(Constants.PANIC,false).apply();
+                sp.edit().putBoolean(Constants.PANIC, false).apply();
             }
             fusedLocationProviderClient.requestLocationUpdates(locationRequest,
                     locationCallback, Looper.myLooper());
@@ -187,6 +211,9 @@ public class ForegroundLocationService extends Service {
         try {
             fusedLocationProviderClient.removeLocationUpdates(locationCallback);
             SettingsUtils.setRequestingLocationUpdates(this, false);
+            SharedPreferenceUtil.initialize(getApplicationContext());
+            SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+            sp.edit().putBoolean(Constants.PANIC, false).apply();
             stopSelf();
         } catch (SecurityException unlikely) {
             SettingsUtils.setRequestingLocationUpdates(this, true);
@@ -292,7 +319,7 @@ public class ForegroundLocationService extends Service {
         locationRequest = new LocationRequest();
         locationRequest.setInterval(Constants.UPDATE_INTERVAL_IN_MILLISECONDS);
         locationRequest.setFastestInterval(Constants.FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
-        locationRequest.setSmallestDisplacement(Constants.SMALLEST_DISPLACEMENT);
+//        locationRequest.setSmallestDisplacement(Constants.SMALLEST_DISPLACEMENT);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 

@@ -1,36 +1,25 @@
 package com.ads.appgm.manager.device.output.panic;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationManager;
-import android.os.Looper;
-import android.widget.Toast;
 
-import androidx.core.app.ActivityCompat;
-
+import com.ads.appgm.service.ForegroundLocationService;
 import com.ads.appgm.util.Constants;
 import com.ads.appgm.util.MyNotification;
 import com.ads.appgm.util.SharedPreferenceUtil;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
 
 public class Panique2 extends Panique {
 
-    private Context context;
-    private FusedLocationProviderClient fusedLocationProviderClient;
+    private final Context context;
     private LocationCallback locationCallback;
 
     public Panique2(Context context) {
         super(context);
         this.context = context;
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
     }
 
     @Override
@@ -49,45 +38,10 @@ public class Panique2 extends Panique {
             myNotification.turnOnGps(context);
             return;
         }
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            MyNotification myNotification = MyNotification.getInstance(context);
-            myNotification.createNotificationChannel();
-            myNotification.openApp(context);
-            return;
-        }
-        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
-            if (location == null) {
-                LocationRequest locationRequest = LocationRequest.create();
-                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                locationRequest.setExpirationDuration(5000);
-                locationRequest.setInterval(100);
-                locationRequest.setNumUpdates(1);
-                fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
-                return;
-            }
-            update(context, location);
-        });
-
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    return;
-                }
-                for (Location location : locationResult.getLocations()) {
-                    update(context, location);
-                }
-            }
-        };
-    }
-
-    private void update(Context context, Location location) {
-        Toast.makeText(context, "Botão do Pânico acionado, latitude: " + location.getLatitude() +
-                ", longitude: " + location.getLongitude(), Toast.LENGTH_LONG).show();
-        MyNotification myNotification = MyNotification.getInstance(context);
-        myNotification.show("Notificação 1", "Latitude: " + location.getLatitude() + "\n" +
-                "Longitude: " + location.getLongitude(), 1,context);
+        Intent intent = new Intent(context, ForegroundLocationService.class);
+        intent.putExtra(Constants.EXTRA_STARTED_FROM_PANICQUICK, true);
+        intent.putExtra(Constants.PANIC, true);
+        context.startService(intent);
     }
 
     @Override
@@ -95,6 +49,10 @@ public class Panique2 extends Panique {
         SharedPreferenceUtil.initialize(context);
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
         sp.edit().putBoolean(Constants.PANIC, false).apply();
+        Intent intent = new Intent(context, ForegroundLocationService.class);
+        intent.putExtra(Constants.EXTRA_STARTED_FROM_PANICQUICK, true);
+        intent.putExtra(Constants.PANIC, false);
+        context.startService(intent);
         this.updateStatus(false);
     }
 }

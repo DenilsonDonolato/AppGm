@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     public ForegroundLocationService getForegroundLocationService() {
         return foregroundLocationService;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -175,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     }
 
     private boolean checkPermissions() {
-        return  PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(this,
+        return PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
     }
 
@@ -239,8 +240,13 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         // Update the buttons state depending on whether location updates are being requested.
-        if (key.equals(SettingsUtils.KEY_REQUESTING_LOCATION_UPDATES)) {
+        if (key.equals(Constants.PANIC)) {
             Log.i(TAG, "Status Changed");
+            if (sharedPreferences.getBoolean(key, false)) {
+                PanicManager.getInstance(true).turnOn(getApplicationContext());
+            } else {
+                PanicManager.getInstance(true).turnOff();
+            }
         }
     }
 
@@ -309,7 +315,6 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     }
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
-
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             ForegroundLocationService.LocalBinder binder = (ForegroundLocationService.LocalBinder) service;

@@ -31,7 +31,7 @@ public class PanicManager {
         }
     }
 
-    private void turnOn(Context context) {
+    public void turnOn(Context context) {
         if (this.mPanic == null) {
             this.mPanic = new Panique2(context);
             if (this.mListener != null) {
@@ -42,7 +42,7 @@ public class PanicManager {
         this.mPanic.start(true);
     }
 
-    private void turnOff() {
+    public void turnOff() {
         if (this.mPanic != null) {
             this.mPanic.start(false);
             this.mPanic = null;
