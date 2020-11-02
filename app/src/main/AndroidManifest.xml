@@ -61,9 +61,10 @@
             android:enabled="true"
             android:foregroundServiceType="location" />
 
-        <receiver android:name=".receiver.BootReadyReceiver">
+        <receiver android:name=".receiver.MyBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.ads.appgm.notificatio" />
             </intent-filter>
         </receiver>
         <receiver android:name=".receiver.RockerReceiver">

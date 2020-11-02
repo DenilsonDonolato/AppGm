@@ -15,6 +15,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.ads.appgm.R;
 import com.ads.appgm.SplashActivity;
+import com.ads.appgm.receiver.MyBroadcastReceiver;
 import com.ads.appgm.service.ForegroundLocationService;
 
 public class MyNotification {
@@ -49,7 +50,7 @@ public class MyNotification {
             NotificationChannel channel = new NotificationChannel(
                     Constants.NOTIFICATION_CHANNEL_ID,
                     Constants.NOTIFICATION_CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_HIGH);
+                    NotificationManager.IMPORTANCE_DEFAULT);
             channel.setDescription(Constants.NOTIFICATION_CHANNEL_DESCRIPTION);
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
@@ -67,18 +68,20 @@ public class MyNotification {
 
     public void turnOnGps(Context context) {
         CharSequence text = context.getText(R.string.app_name);
-        Intent intent = new Intent(context, ForegroundLocationService.class);
-        PendingIntent servicePendingIntent = PendingIntent.getService(context, 0, intent,
+        Intent intent = new Intent(context, MyBroadcastReceiver.class);
+        intent.setAction("com.ads.appgm.notification");
+        intent.putExtra(Constants.EXTRA_STARTED_FROM_NOTIFICATION, Constants.NOTIFICATION_ID_LIGAR_GPS);
+        PendingIntent cancel = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent turnOnGps = PendingIntent.getActivity(context, 0,
                 new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
         Notification notification = new NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
                 .addAction(R.drawable.ic_launch, "Ligar GPS", turnOnGps)
-                .addAction(R.drawable.ic_cancel, "Cancelar", servicePendingIntent)
+                .addAction(R.drawable.ic_cancel, "Cancelar", cancel)
                 .setContentText(text)
                 .setContentTitle("SOS Maria precisa ler sua localização")
-                .setOngoing(true)
-                .setPriority(Notification.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setPriority(Notification.PRIORITY_DEFAULT)
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setTicker(text)
                 .build();
@@ -106,8 +109,8 @@ public class MyNotification {
                 .addAction(R.drawable.ic_cancel, "Cancelar", servicePendingIntent)
                 .setContentText(text)
                 .setContentTitle("Sua encomenda está a caminho")
-                .setOngoing(true)
-                .setPriority(Notification.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setPriority(Notification.PRIORITY_DEFAULT)
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setTicker(text)
                 .build();
@@ -123,7 +126,8 @@ public class MyNotification {
                 .addAction(R.drawable.ic_cancel, "Cancelar", null)
                 .setContentText(text)
                 .setContentTitle("SOS Maria precisa de sua atenção")
-                .setPriority(Notification.PRIORITY_HIGH)
+                .setPriority(Notification.PRIORITY_DEFAULT)
+                .setAutoCancel(true)
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setTicker(text)
                 .build();
