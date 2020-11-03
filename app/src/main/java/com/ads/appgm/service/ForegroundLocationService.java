@@ -178,7 +178,7 @@ public class ForegroundLocationService extends Service {
 
     public void requestLocationUpdates() {
         SettingsUtils.setRequestingLocationUpdates(this, true);
-//        startService(new Intent(getApplicationContext(), ForegroundLocationService.class));
+        startService(new Intent(getApplicationContext(), ForegroundLocationService.class));
         try {
             if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 myNotification.turnOnGps(getApplicationContext());

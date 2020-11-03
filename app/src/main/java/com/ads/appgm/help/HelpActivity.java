@@ -1,13 +1,16 @@
 package com.ads.appgm.help;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.ads.appgm.R;
 import com.ads.appgm.databinding.ActivityHelpBinding;
-import com.synnapps.carouselview.ImageListener;
+import com.synnapps.carouselview.ViewListener;
 
 public class HelpActivity extends AppCompatActivity {
 
@@ -27,8 +30,7 @@ public class HelpActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         binding.carouselHelp.setPageCount(helpImages.length);
-
-        binding.carouselHelp.setImageListener(imageListener);
+        binding.carouselHelp.setViewListener(viewListener);
 
         setSupportActionBar(binding.settingsToolbar.getRoot());
         ActionBar actionBar = getSupportActionBar();
@@ -38,5 +40,10 @@ public class HelpActivity extends AppCompatActivity {
         binding.settingsToolbar.getRoot().setNavigationOnClickListener(view -> onBackPressed());
     }
 
-    ImageListener imageListener = (position, imageView) -> imageView.setImageResource(helpImages[position]);
+    ViewListener viewListener = position -> {
+        View customView = getLayoutInflater().inflate(R.layout.carousel_image, null);
+        ImageView imageView = customView.findViewById(R.id.carouselImage);
+        imageView.setImageDrawable(ContextCompat.getDrawable(this, helpImages[position]));
+        return customView;
+    };
 }

@@ -43,7 +43,6 @@ public class BackgroundLocationService extends Worker {
     private static final String TAG = "com.ads.appgm.NotPanicUpdates";
     private final Handler mMainThreadHandler = new Handler(Looper.getMainLooper());
     private CancellationTokenSource cancellationToken;
-    private MyNotification myNotification;
 
     public BackgroundLocationService(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -63,7 +62,7 @@ public class BackgroundLocationService extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        myNotification = MyNotification.getInstance(getApplicationContext());
+        MyNotification myNotification = MyNotification.getInstance(getApplicationContext());
         SharedPreferenceUtil.initialize(getApplicationContext());
         FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(getApplicationContext());
         myNotification.createNotificationChannel();
