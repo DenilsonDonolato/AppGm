@@ -25,6 +25,9 @@ android {
         debug {
             buildConfigField("String", "BASE_URL", "\"https://e549caf6907b.ngrok.io\"")
         }
+        hml {
+            buildConfigField("String", "BASE_URL", "\"https://guarda-municipal.herokuapp.com/\"")
+        }
     }
 
     compileOptions {

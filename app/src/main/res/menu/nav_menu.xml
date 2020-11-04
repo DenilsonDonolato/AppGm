@@ -10,9 +10,10 @@
             android:title="@string/settings"/>
     </group>
     <group android:id="@+id/nav_group_about">
-        <item android:id="@+id/nav_help"
+        <item
+            android:id="@+id/nav_help"
             android:icon="@drawable/ic_help_outline"
-            android:title="Manual de Uso"/>
+            android:title="@string/user_guide" />
         <item android:id="@+id/nav_about"
             android:icon="@drawable/ic_outline_info_24"
             android:title="@string/about"/>

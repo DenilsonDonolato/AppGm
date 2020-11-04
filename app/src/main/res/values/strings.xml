@@ -13,19 +13,19 @@
     <string name="login_cpf_hint">CPF</string>
     <string name="button_login">Entrar</string>
     <string name="button_panic">Pânico</string>
-    <string name="funcao_panico">Função Pânico</string>
+    <string name="funcao_panico">Acionamento Rápido</string>
     <string name="proximity_error">Erro</string>
     <string name="camera_error">Erro na camera</string>
     <string name="camera_busy">Camera Ocupada</string>
     <string name="panic_unsupported">Luz não suportada</string>
-    <string name="service_paniquequick_name">Panico rápido</string>
+    <string name="service_paniquequick_name">Acionamento Rápido SOS Maria</string>
     <string name="accessibility_service_description_2"><b>Sobre a permissão- </b> \"<i>...observa os pressionamentos de botões</i>\"\nAndroid dispara um  \'Evento de Tecla\' somente quando um botão é pressionado. É dessa maneira que o SOS Maria captura acionamentos das Teclas de Volume.
         \nEste aplicativo coleta sua localização para enviar à Guarda Municipal em caso de acionamento, nenhuma outra informação é coletada</string>
-    <string name="accessibility_service_description">Quando o Pânico Rápido está ligado, dispare o Pânico pressionando os juntos os botões de Volume</string>
-    <string name="notify_title">Pânico rápido está desativado</string>
-    <string name="notify_text">Toque para ativar o Pânico Rápido</string>
-    <string name="permission">Ativar função de Pânico Rápido?</string>
-    <string name="permission_note">Ative a função Pânico Rápido nos Serviços de Acessibilidade</string>
+    <string name="accessibility_service_description">Quando o Acionamento Rápido está ligado, dispare o Pânico pressionando os juntos os botões de Volume</string>
+    <string name="notify_title">Acionamento Rápido está desativado</string>
+    <string name="notify_text">Toque para ativar o Acionamento Rápido</string>
+    <string name="permission">Ativar função de Acionamento Rápido?</string>
+    <string name="permission_note">Ative a função Acionamento Rápido nos Serviços de Acessibilidade</string>
     <string name="permission_summary"><b>Uso do Serviço de Acessibilidade</b>\nSOS Maria precisa de um serviço de acessibilidade em seguno plano. Um Serviço de Acessibilidade pode observar os pressionamentos de botões, os Serviços em segundo plano comuns não conseguem. Apenas interceptamos os botões de Volume.</string>
     <string name="later">Mais tarde</string>
     <string name="enable">Ativar</string>
@@ -45,14 +45,15 @@
     <string name="title_activity_settings">Configurações</string>
 
     <!-- Preference Titles -->
-    <string name="sync_header">Função Pânico Rápido</string>
+    <string name="sync_header">Função Acionamento Rápido</string>
 
     <!-- Messages Preferences -->
     <string name="reply_title">Default reply action</string>
 
     <!-- Sync Preferences -->
-    <string name="panic_quick">Função de Pânico</string>
-    <string name="panic_quick_on">Pânico Rápido ativado, use os botões de volume para ativar o pânico</string>
-    <string name="panic_quick_off">Ative a função de Pânico rápido para ativar o pânico usando os botões de volume</string>
+    <string name="panic_quick">Acionamento Rápido</string>
+    <string name="panic_quick_on">Acionamento Rápido ativado, use os botões de volume para ativar o pânico</string>
+    <string name="panic_quick_off">Ative a função de Acionamento Rápido para ativar o pânico usando os botões de volume</string>
     <string name="gps_off_warning">É necessário ativar o GPS</string>
+    <string name="user_guide">Manual de Uso</string>
 </resources>
