@@ -100,9 +100,13 @@ public class MyNotification {
         PendingIntent servicePendingIntent = PendingIntent.getService(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
+        Intent appIntent = new Intent(context, SplashActivity.class);
+        appIntent.setAction(Intent.ACTION_MAIN);
+        appIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+
         // The PendingIntent to launch activity.
         PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0,
-                new Intent(context, SplashActivity.class), 0);
+                appIntent, 0);
 
         return new NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
                 .addAction(R.drawable.ic_launch, "Abrir app", activityPendingIntent)

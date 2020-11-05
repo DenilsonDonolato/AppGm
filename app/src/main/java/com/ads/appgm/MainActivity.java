@@ -240,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         // Update the buttons state depending on whether location updates are being requested.
-        if (key.equals(Constants.PANIC)) {
+        if (key.equals(SettingsUtils.KEY_REQUESTING_LOCATION_UPDATES)) {
             Log.i(TAG, "Status Changed");
             if (sharedPreferences.getBoolean(key, false)) {
                 PanicManager.getInstance(true).turnOn(getApplicationContext());

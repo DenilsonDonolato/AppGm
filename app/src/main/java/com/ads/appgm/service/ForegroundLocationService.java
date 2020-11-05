@@ -135,14 +135,14 @@ public class ForegroundLocationService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        stopForeground(true);
+//        stopForeground(true);
         changingConfiguration = false;
         return mBinder;
     }
 
     @Override
     public void onRebind(Intent intent) {
-        stopForeground(true);
+//        stopForeground(true);
         changingConfiguration = false;
         super.onRebind(intent);
     }
@@ -152,17 +152,18 @@ public class ForegroundLocationService extends Service {
         // Called when the last client (MainActivity in case of this sample) unbinds from this
         // service. If this method is called due to a configuration change in MainActivity, we
         // do nothing. Otherwise, we make this service a foreground service.
-        if (!changingConfiguration && SettingsUtils.requestingLocationUpdates(this)) {
-//            Log.i(TAG, "Starting foreground service");
-
-            startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE, myNotification.foregroundNotification(getApplicationContext()));
-        }
+//        if (!changingConfiguration && SettingsUtils.requestingLocationUpdates(this)) {
+////            Log.i(TAG, "Starting foreground service");
+//
+//            startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE, myNotification.foregroundNotification(getApplicationContext()));
+//        }
         return true; // Ensures onRebind() is called when a client re-binds.
     }
 
     @Override
     public void onDestroy() {
-        myNotification.cancel(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE);
+        stopForeground(true);
+//        myNotification.cancel(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE);
         serviceHandler.removeCallbacksAndMessages(null);
     }
 
@@ -179,6 +180,9 @@ public class ForegroundLocationService extends Service {
     public void requestLocationUpdates() {
         SettingsUtils.setRequestingLocationUpdates(this, true);
         startService(new Intent(getApplicationContext(), ForegroundLocationService.class));
+        if (!serviceIsRunningInForeground(getApplicationContext())) {
+            startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE, myNotification.foregroundNotification(getApplicationContext()));
+        }
         try {
             if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 myNotification.turnOnGps(getApplicationContext());
@@ -208,6 +212,7 @@ public class ForegroundLocationService extends Service {
     }
 
     public void removeLocationUpdates() {
+        stopForeground(true);
         try {
             fusedLocationProviderClient.removeLocationUpdates(locationCallback);
             SettingsUtils.setRequestingLocationUpdates(this, false);

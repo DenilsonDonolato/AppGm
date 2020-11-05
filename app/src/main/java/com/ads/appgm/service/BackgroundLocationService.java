@@ -53,8 +53,8 @@ public class BackgroundLocationService extends Worker {
         WorkManager wm = WorkManager.getInstance(context);
         PeriodicWorkRequest pwr = new PeriodicWorkRequest
                 .Builder(BackgroundLocationService.class,
-                1, TimeUnit.MINUTES,
-                1, TimeUnit.MINUTES)
+                1, TimeUnit.HOURS,
+                15, TimeUnit.MINUTES)
                 .build();
         wm.enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.KEEP, pwr);
     }
