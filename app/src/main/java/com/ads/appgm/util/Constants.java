@@ -52,6 +52,7 @@ public class Constants {
     public static final String EXTRA_STARTED_FROM_PANICQUICK = PACKAGE_NAME +
             ".started_from_panicquick";
     public static final float SMALLEST_DISPLACEMENT = 10;
+    public static final String FIRST_ACTUATION = "FIRST_ACTUATION";
 
     public final static String ID_DEVICE_OUTPUT = "1";
     public final static String ID_DEVICE_OUTPUT_PANIC = "10";

@@ -27,6 +27,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.ads.appgm.R;
+import com.ads.appgm.model.Actuation;
 import com.ads.appgm.model.MyLocation;
 import com.ads.appgm.util.Constants;
 import com.ads.appgm.util.MyNotification;
@@ -198,8 +199,8 @@ public class ForegroundLocationService extends Service {
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
                             Manifest.permission.ACCESS_FINE_LOCATION},
                     Constants.GPS_PERMISSION_REQUEST,
-                    "MyNotification title",
-                    "This app needs a write permission",
+                    getString(R.string.app_name),
+                    getString(R.string.reason_gps),
                     R.mipmap.ic_launcher)
                     .enqueue(permissionResponse -> {
                         if (permissionResponse.isGranted()) {
@@ -227,8 +228,8 @@ public class ForegroundLocationService extends Service {
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
                             Manifest.permission.ACCESS_FINE_LOCATION},
                     Constants.GPS_PERMISSION_REQUEST,
-                    "MyNotification title",
-                    "This app needs a write permission",
+                    getString(R.string.app_name),
+                    getString(R.string.reason_gps),
                     R.mipmap.ic_launcher)
                     .enqueue(permissionResponse -> {
                         if (permissionResponse.isGranted()) {
@@ -282,13 +283,37 @@ public class ForegroundLocationService extends Service {
         Intent intent = new Intent(Constants.ACTION_BROADCAST);
         intent.putExtra(Constants.EXTRA_LOCATION, location);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-
-        sendLocationToBackEnd();
+        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        if (sp.getBoolean(Constants.FIRST_ACTUATION, true)) {
+            sendLocationToBackEnd();
+            sp.edit().putBoolean(Constants.FIRST_ACTUATION, false).apply();
+        } else {
+            getActuation();
+        }
         // Update notification content if running as a foreground service.
 //        if (serviceIsRunningInForeground(this)) {
 //            notificationManager.notify(NOTIFICATION_ID, getNotification());
 //        }
     }
+
+    private void getActuation() {
+        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        BackEndService client = HttpClient.getInstance();
+        client.getActuation(sp.getString(Constants.USER_TOKEN, "0"), sp.getString(Constants.MEASURE_ID, "0"))
+                .enqueue(getActuationCallback);
+    }
+
+    Callback<Actuation> getActuationCallback = new Callback<Actuation>() {
+        @Override
+        public void onResponse(@NotNull Call<Actuation> call, @NotNull Response<Actuation> response) {
+
+        }
+
+        @Override
+        public void onFailure(@NotNull Call<Actuation> call, @NotNull Throwable t) {
+
+        }
+    };
 
     private void sendLocationToBackEnd() {
         BackEndService client = HttpClient.getInstance();
@@ -297,11 +322,11 @@ public class ForegroundLocationService extends Service {
         position.add(location.getLongitude());
         MyLocation myLocation = new MyLocation(position, true);
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
-        Call<Void> call = client.postLocation(myLocation, sp.getString(Constants.USER_TOKEN, ""));
-        call.enqueue(responseCallback);
+        Call<Void> call = client.postLocation(myLocation, sp.getString(Constants.USER_TOKEN, "0"));
+        call.enqueue(sendLocationCallback);
     }
 
-    Callback<Void> responseCallback = new Callback<Void>() {
+    Callback<Void> sendLocationCallback = new Callback<Void>() {
         @Override
         public void onResponse(@NotNull Call<Void> call, Response<Void> response) {
             if (response.code() == 200) {
