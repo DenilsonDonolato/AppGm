@@ -6,9 +6,9 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.ads.appgm.R;
+import com.ads.appgm.service.ForegroundLocationService;
 import com.ads.appgm.service.PaniqueQuick;
 import com.ads.appgm.util.Constants;
-import com.ads.appgm.util.MyNotification;
 import com.ads.appgm.util.NotificationUtils;
 
 public class MyBroadcastReceiver extends BroadcastReceiver {
@@ -22,8 +22,9 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
         } else if (intent.getAction().equals("com.ads.appgm.notification")) {
             int notificationId = intent.getIntExtra(Constants.EXTRA_STARTED_FROM_NOTIFICATION, 0);
             if (notificationId > 0) {
-                MyNotification myNotification = MyNotification.getInstance(context);
-                myNotification.cancel(notificationId);
+                Intent service = new Intent(context, ForegroundLocationService.class);
+                service.putExtra(Constants.CANCEL_INTENT, true);
+                context.startService(service);
             }
         }
     }

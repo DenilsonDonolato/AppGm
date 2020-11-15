@@ -1,6 +1,5 @@
 package com.ads.appgm.service;
 
-import android.Manifest;
 import android.app.ActivityManager;
 import android.app.Dialog;
 import android.app.Service;
@@ -39,7 +38,6 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.permissioneverywhere.PermissionEverywhere;
 import com.permissioneverywhere.PermissionResultCallback;
 
 import org.jetbrains.annotations.NotNull;
@@ -64,6 +62,7 @@ public class ForegroundLocationService extends Service {
     private Location location;
     private Handler serviceHandler;
     private boolean changingConfiguration = false;
+    private SharedPreferences sp;
 
     public ForegroundLocationService() {
     }
@@ -89,6 +88,8 @@ public class ForegroundLocationService extends Service {
         serviceHandler = new Handler(handlerThread.getLooper());
         myNotification = MyNotification.getInstance(getApplicationContext());
         myNotification.createNotificationChannel();
+        SharedPreferenceUtil.initialize(getApplicationContext());
+        sp = SharedPreferenceUtil.getSharedePreferences();
     }
 
     @Override
@@ -96,16 +97,29 @@ public class ForegroundLocationService extends Service {
         boolean startedFromNotification = intent.getBooleanExtra(Constants.EXTRA_STARTED_FROM_NOTIFICATION,
                 false);
         boolean startedFromPanicQuick = intent.getBooleanExtra(Constants.EXTRA_STARTED_FROM_PANICQUICK, false);
+        boolean startedFromApp = intent.getBooleanExtra(Constants.EXTRA_STARTED_FROM_APP, false);
+        boolean cancelIntent = intent.getBooleanExtra(Constants.CANCEL_INTENT, false);
 
         // We got here because the user decided to remove location updates from the notification.
-        if (startedFromNotification) {
+        if (startedFromNotification || cancelIntent) {
+            sp.edit().putBoolean(Constants.PANIC, false).apply();
+            SettingsUtils.setRequestingLocationUpdates(this, false);
             removeLocationUpdates();
             stopSelf();
             myNotification.cancel(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE);
         }
 
+        if (startedFromApp) {
+            sp.edit().putBoolean(Constants.PANIC, true).apply();
+            SettingsUtils.setRequestingLocationUpdates(this, true);
+            startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE, myNotification.foregroundNotification(this));
+            requestLocationUpdates();
+        }
+
         if (startedFromPanicQuick) {
             if (intent.getBooleanExtra(Constants.PANIC, false)) {
+                sp.edit().putBoolean(Constants.PANIC, true).apply();
+                SettingsUtils.setRequestingLocationUpdates(this, true);
                 Log.i(TAG, "Starting foreground service");
                 requestLocationUpdates();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -117,6 +131,8 @@ public class ForegroundLocationService extends Service {
                             myNotification.foregroundNotification(getApplicationContext()));
                 }
             } else {
+                sp.edit().putBoolean(Constants.PANIC, false).apply();
+                SettingsUtils.setRequestingLocationUpdates(this, false);
                 myNotification.cancel(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE);
                 removeLocationUpdates();
                 stopSelf();
@@ -179,36 +195,25 @@ public class ForegroundLocationService extends Service {
     };
 
     public void requestLocationUpdates() {
-        SettingsUtils.setRequestingLocationUpdates(this, true);
+        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
         startService(new Intent(getApplicationContext(), ForegroundLocationService.class));
-        if (!serviceIsRunningInForeground(getApplicationContext())) {
-            startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE, myNotification.foregroundNotification(getApplicationContext()));
-        }
         try {
             if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                myNotification.turnOnGps(getApplicationContext());
-                SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+                SettingsUtils.setRequestingLocationUpdates(this, false);
                 sp.edit().putBoolean(Constants.PANIC, false).apply();
+                startForeground(Constants.GPS_TURN_ON, myNotification.turnOnGps(getApplicationContext()));
+            } else {
+                SettingsUtils.setRequestingLocationUpdates(this, true);
+                sp.edit().putBoolean(Constants.PANIC, true).apply();
+                startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE, myNotification.foregroundNotification(getApplicationContext()));
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest,
+                        locationCallback, Looper.myLooper());
             }
-            fusedLocationProviderClient.requestLocationUpdates(locationRequest,
-                    locationCallback, Looper.myLooper());
         } catch (SecurityException unlikely) {
             SettingsUtils.setRequestingLocationUpdates(this, false);
             Log.e(TAG, "Lost location permission. Could not request updates. " + unlikely);
-            PermissionEverywhere.getPermission(getApplicationContext(),
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                            Manifest.permission.ACCESS_FINE_LOCATION},
-                    Constants.GPS_PERMISSION_REQUEST,
-                    getString(R.string.app_name),
-                    getString(R.string.reason_gps),
-                    R.mipmap.ic_launcher)
-                    .enqueue(permissionResponse -> {
-                        if (permissionResponse.isGranted()) {
-                            requestLocationUpdates();
-                        } else {
-                            stopSelf();
-                        }
-                    });
+            MyPermission myPermission = MyPermission.getInstance();
+            myPermission.requestGPS(getApplicationContext(), permissionResultCallback);
         }
     }
 
@@ -224,20 +229,8 @@ public class ForegroundLocationService extends Service {
         } catch (SecurityException unlikely) {
             SettingsUtils.setRequestingLocationUpdates(this, true);
             Log.e(TAG, "Lost location permission. Could not remove updates. " + unlikely);
-            PermissionEverywhere.getPermission(getApplicationContext(),
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                            Manifest.permission.ACCESS_FINE_LOCATION},
-                    Constants.GPS_PERMISSION_REQUEST,
-                    getString(R.string.app_name),
-                    getString(R.string.reason_gps),
-                    R.mipmap.ic_launcher)
-                    .enqueue(permissionResponse -> {
-                        if (permissionResponse.isGranted()) {
-                            removeLocationUpdates();
-                        } else {
-                            stopSelf();
-                        }
-                    });
+            MyPermission.getInstance()
+                    .requestGPS(this, permissionResultCallback);
         }
     }
 
@@ -268,7 +261,7 @@ public class ForegroundLocationService extends Service {
 
     private final PermissionResultCallback permissionResultCallback = permissionResponse -> {
         if (permissionResponse.isGranted()) {
-            ForegroundLocationService.this.getLastLocation();
+            ForegroundLocationService.this.requestLocationUpdates();
         } else {
             ForegroundLocationService.this.stopSelf();
         }
@@ -283,13 +276,15 @@ public class ForegroundLocationService extends Service {
         Intent intent = new Intent(Constants.ACTION_BROADCAST);
         intent.putExtra(Constants.EXTRA_LOCATION, location);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
-        if (sp.getBoolean(Constants.FIRST_ACTUATION, true)) {
-            sendLocationToBackEnd();
-            sp.edit().putBoolean(Constants.FIRST_ACTUATION, false).apply();
-        } else {
-            getActuation();
-        }
+
+        sendLocationToBackEnd();
+//        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+//        if (sp.getBoolean(Constants.FIRST_ACTUATION, true)) {
+//            sendLocationToBackEnd();
+//            sp.edit().putBoolean(Constants.FIRST_ACTUATION, false).apply();
+//        } else {
+//            getActuation();
+//        }
         // Update notification content if running as a foreground service.
 //        if (serviceIsRunningInForeground(this)) {
 //            notificationManager.notify(NOTIFICATION_ID, getNotification());

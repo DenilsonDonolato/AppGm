@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     private ForegroundLocationService foregroundLocationService = null;
     private boolean serviceBound = false;
+    private LocationManager lm;
 
     public ForegroundLocationService getForegroundLocationService() {
         return foregroundLocationService;
@@ -71,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
         binding.textViewName.setText(getUserName(sp));
         setButtonPanicState(sp);
+
+        lm = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         setSupportActionBar(binding.toolbar.getRoot());
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.getRoot(), binding.toolbar.getRoot(),
@@ -242,11 +247,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         // Update the buttons state depending on whether location updates are being requested.
         if (key.equals(SettingsUtils.KEY_REQUESTING_LOCATION_UPDATES)) {
             Log.i(TAG, "Status Changed");
-            if (sharedPreferences.getBoolean(key, false)) {
-                PanicManager.getInstance(true).turnOn(getApplicationContext());
-            } else {
-                PanicManager.getInstance(true).turnOff();
-            }
+            onPanicStatusChanged(sharedPreferences.getBoolean(key, false));
         }
     }
 
@@ -328,4 +329,29 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
             serviceBound = false;
         }
     };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Constants.GPS_TURN_ON) {
+            if (gpsLigado()) {
+                startForegroundService();
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.gps_off_warning, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    public boolean gpsLigado() {
+        return lm != null && lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+    public void startForegroundService() {
+        Intent intent = new Intent(getApplicationContext(), ForegroundLocationService.class);
+        intent.putExtra(Constants.EXTRA_STARTED_FROM_APP, true);
+        getApplicationContext().startService(intent);
+        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        sp.edit().putBoolean(Constants.PANIC, true).apply();
+        binding.buttonPanic.setBackground(ContextCompat.getDrawable(this, R.drawable.custom_button_active));
+    }
 }

@@ -66,7 +66,7 @@ public class MyNotification {
         notificationManager.cancel(id);
     }
 
-    public void turnOnGps(Context context) {
+    public Notification turnOnGps(Context context) {
         CharSequence text = context.getText(R.string.app_name);
         Intent intent = new Intent(context, MyBroadcastReceiver.class);
         intent.setAction("com.ads.appgm.notification");
@@ -75,7 +75,7 @@ public class MyNotification {
                 PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent turnOnGps = PendingIntent.getActivity(context, 0,
                 new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
-        Notification notification = new NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
+        return new NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
                 .addAction(R.drawable.ic_launch, "Ligar GPS", turnOnGps)
                 .addAction(R.drawable.ic_cancel, "Cancelar", cancel)
                 .setContentText(text)
@@ -85,7 +85,6 @@ public class MyNotification {
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setTicker(text)
                 .build();
-        notificationManager.notify(Constants.NOTIFICATION_ID_LIGAR_GPS,notification);
     }
 
     public Notification foregroundNotification(Context context) {
@@ -120,12 +119,12 @@ public class MyNotification {
                 .build();
     }
 
-    public void openApp(Context context) {
+    public Notification openApp(Context context) {
         PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0,
                 new Intent(context, SplashActivity.class), 0);
         CharSequence text = context.getText(R.string.app_name);
         Log.d("BackJOB", "Sending Permission");
-        Notification permission = new NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
+        return new NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
                 .addAction(R.drawable.ic_launch, "Abrir app", activityPendingIntent)
                 .addAction(R.drawable.ic_cancel, "Cancelar", null)
                 .setContentText(text)
@@ -135,6 +134,5 @@ public class MyNotification {
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setTicker(text)
                 .build();
-        notificationManager.notify(Constants.GPS_PERMISSION_REQUEST,permission);
     }
 }
