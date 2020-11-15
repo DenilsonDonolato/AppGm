@@ -21,5 +21,5 @@ public interface BackEndService {
     Call<Void> postLocation(@Body MyLocation myLocation, @Header("Authorization") String token);
 
     @GET("mobile/actuation/{id}")
-    Call<Actuation> getActuation(@Header("Authorization") String token, @Path("id") String measureId);
+    Call<Actuation> getActuation(@Header("Authorization") String token, @Path("id") Long measureId);
 }

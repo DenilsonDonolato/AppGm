@@ -283,7 +283,7 @@ public class ForegroundLocationService extends Service {
 
     private void getActuation() {
         BackEndService client = HttpClient.getInstance();
-        client.getActuation(sp.getString(Constants.USER_TOKEN, "0"), sp.getString(Constants.MEASURE_ID, "0"))
+        client.getActuation(sp.getString(Constants.USER_TOKEN, "0"), sp.getLong(Constants.MEASURE_ID, 0))
                 .enqueue(getActuationCallback);
     }
 
@@ -296,6 +296,9 @@ public class ForegroundLocationService extends Service {
                     sendLocationToBackEnd(false);
                 } else {
                     myNotification.show(getString(R.string.app_name), "Chamado encerrado", 9999, getApplicationContext());
+                    sp.edit().putBoolean(Constants.PANIC, false).apply();
+                    SettingsUtils.setRequestingLocationUpdates(getApplicationContext(), false);
+                    removeLocationUpdates();
                 }
             }
         }
