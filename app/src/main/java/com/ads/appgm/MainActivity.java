@@ -1,10 +1,7 @@
 package com.ads.appgm;
 
 import android.Manifest;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -12,7 +9,6 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
@@ -55,13 +51,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
-    private ForegroundLocationService foregroundLocationService = null;
-    private boolean serviceBound = false;
     private LocationManager lm;
-
-    public ForegroundLocationService getForegroundLocationService() {
-        return foregroundLocationService;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,11 +85,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     }
 
     private void setButtonPanicState(SharedPreferences sp) {
-        boolean status = sp.getBoolean("panicActive", false);
-        if (isPaniqueQuickServiceRunning() && PaniqueQuick.getInstance() != null) {
-            status |= PaniqueQuick.getInstance().getPanicStatus();
-        }
-        togglePanic(status);
+        togglePanic(sp.getBoolean("panicActive", false));
     }
 
     private void togglePanic(boolean isActive) {
@@ -141,8 +127,6 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
     protected void onStart() {
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
-        bindService(new Intent(this, ForegroundLocationService.class), serviceConnection,
-                Context.BIND_AUTO_CREATE);
         binding.buttonPanic.setOnClickListener(new ButtonPanic(this));
         super.onStart();
     }
@@ -171,10 +155,6 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     @Override
     protected void onStop() {
-        if (serviceBound) {
-            unbindService(serviceConnection);
-            serviceBound = false;
-        }
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this);
         super.onStop();
@@ -258,6 +238,9 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     @Override
     public void onPanicStatusChanged(final boolean status) {
+        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        sp.edit().putBoolean(Constants.PANIC, status).apply();
+        SettingsUtils.setRequestingLocationUpdates(getApplicationContext(), status);
         runOnUiThread(() -> togglePanic(status));
     }
 
@@ -314,21 +297,6 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
             super.onBackPressed();
         }
     }
-
-    private final ServiceConnection serviceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            ForegroundLocationService.LocalBinder binder = (ForegroundLocationService.LocalBinder) service;
-            foregroundLocationService = binder.getService();
-            serviceBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            foregroundLocationService = null;
-            serviceBound = false;
-        }
-    };
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

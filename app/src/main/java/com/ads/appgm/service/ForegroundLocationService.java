@@ -8,10 +8,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ServiceInfo;
-import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -34,6 +32,7 @@ import com.ads.appgm.util.MyPermission;
 import com.ads.appgm.util.SettingsUtils;
 import com.ads.appgm.util.SharedPreferenceUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -53,7 +52,6 @@ public class ForegroundLocationService extends Service {
 
     private static final String TAG = ForegroundLocationService.class.getSimpleName();
 
-    private final IBinder mBinder = new LocalBinder();
     private FusedLocationProviderClient fusedLocationProviderClient;
     private LocationManager locationManager;
     private LocationRequest locationRequest;
@@ -61,7 +59,6 @@ public class ForegroundLocationService extends Service {
     private MyNotification myNotification;
     private Location location;
     private Handler serviceHandler;
-    private boolean changingConfiguration = false;
     private SharedPreferences sp;
 
     public ForegroundLocationService() {
@@ -70,15 +67,37 @@ public class ForegroundLocationService extends Service {
     @Override
     public void onCreate() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
                 onNewLocation(locationResult.getLastLocation());
             }
-        };
 
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            @Override
+            public void onLocationAvailability(LocationAvailability locationAvailability) {
+                super.onLocationAvailability(locationAvailability);
+                if (!locationAvailability.isLocationAvailable()) {
+                    Log.e(TAG, "Gps Turned Off");
+                    startForeground(Constants.NOTIFICATION_ID_LIGAR_GPS, myNotification.turnOnGps(getApplicationContext()));
+                    sp.edit().putBoolean(Constants.PANIC, false).apply();
+                    SettingsUtils.setRequestingLocationUpdates(getApplicationContext(), false);
+                } else {
+                    sp.edit().putBoolean(Constants.PANIC, true).apply();
+                    SettingsUtils.setRequestingLocationUpdates(getApplicationContext(), true);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE,
+                                myNotification.foregroundNotification(getApplicationContext()),
+                                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
+                    } else {
+                        startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE,
+                                myNotification.foregroundNotification(getApplicationContext()));
+                    }
+                }
+            }
+        };
 
         createLocationRequest();
         getLastLocation();
@@ -112,7 +131,6 @@ public class ForegroundLocationService extends Service {
         if (startedFromApp) {
             sp.edit().putBoolean(Constants.PANIC, true).apply();
             SettingsUtils.setRequestingLocationUpdates(this, true);
-            startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE, myNotification.foregroundNotification(this));
             requestLocationUpdates();
         }
 
@@ -122,14 +140,6 @@ public class ForegroundLocationService extends Service {
                 SettingsUtils.setRequestingLocationUpdates(this, true);
                 Log.i(TAG, "Starting foreground service");
                 requestLocationUpdates();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE,
-                            myNotification.foregroundNotification(getApplicationContext()),
-                            ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
-                } else {
-                    startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE,
-                            myNotification.foregroundNotification(getApplicationContext()));
-                }
             } else {
                 sp.edit().putBoolean(Constants.PANIC, false).apply();
                 SettingsUtils.setRequestingLocationUpdates(this, false);
@@ -143,44 +153,17 @@ public class ForegroundLocationService extends Service {
         return START_NOT_STICKY;
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        changingConfiguration = true;
-    }
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-//        stopForeground(true);
-        changingConfiguration = false;
-        return mBinder;
-    }
-
-    @Override
-    public void onRebind(Intent intent) {
-//        stopForeground(true);
-        changingConfiguration = false;
-        super.onRebind(intent);
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        // Called when the last client (MainActivity in case of this sample) unbinds from this
-        // service. If this method is called due to a configuration change in MainActivity, we
-        // do nothing. Otherwise, we make this service a foreground service.
-//        if (!changingConfiguration && SettingsUtils.requestingLocationUpdates(this)) {
-////            Log.i(TAG, "Starting foreground service");
-//
-//            startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE, myNotification.foregroundNotification(getApplicationContext()));
-//        }
-        return true; // Ensures onRebind() is called when a client re-binds.
+        return null;
     }
 
     @Override
     public void onDestroy() {
         stopForeground(true);
-//        myNotification.cancel(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE);
+        sp.edit().putBoolean(Constants.PANIC, false).apply();
+        SettingsUtils.setRequestingLocationUpdates(this, false);
         serviceHandler.removeCallbacksAndMessages(null);
     }
 
@@ -205,7 +188,6 @@ public class ForegroundLocationService extends Service {
             } else {
                 SettingsUtils.setRequestingLocationUpdates(this, true);
                 sp.edit().putBoolean(Constants.PANIC, true).apply();
-                startForeground(Constants.NOTIFICATION_ID_FOREGROUND_SERVICE, myNotification.foregroundNotification(getApplicationContext()));
                 fusedLocationProviderClient.requestLocationUpdates(locationRequest,
                         locationCallback, Looper.myLooper());
             }
@@ -346,12 +328,6 @@ public class ForegroundLocationService extends Service {
         locationRequest.setFastestInterval(Constants.FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
 //        locationRequest.setSmallestDisplacement(Constants.SMALLEST_DISPLACEMENT);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-
-    public class LocalBinder extends Binder {
-        public ForegroundLocationService getService() {
-            return ForegroundLocationService.this;
-        }
     }
 
     public boolean serviceIsRunningInForeground(Context context) {
