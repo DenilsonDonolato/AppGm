@@ -113,6 +113,11 @@ public class ForegroundLocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            intent = new Intent(getApplicationContext(), ForegroundLocationService.class);
+            intent.putExtra(Constants.EXTRA_STARTED_FROM_PANICQUICK, true);
+            intent.putExtra(Constants.PANIC, true);
+        }
         boolean startedFromNotification = intent.getBooleanExtra(Constants.EXTRA_STARTED_FROM_NOTIFICATION,
                 false);
         boolean startedFromPanicQuick = intent.getBooleanExtra(Constants.EXTRA_STARTED_FROM_PANICQUICK, false);
@@ -149,8 +154,7 @@ public class ForegroundLocationService extends Service {
             }
         }
 
-        // Tells the system to not try to recreate the service after it has been killed.
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Nullable
