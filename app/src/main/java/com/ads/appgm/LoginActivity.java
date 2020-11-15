@@ -132,7 +132,7 @@ public class LoginActivity extends AppCompatActivity {
                 Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 150);
                 return;
             }
-            SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+            SharedPreferences sp = SharedPreferenceUtil.getSharedPreferences();
             sp.edit().putString(Constants.USER_TOKEN, loginResponse.getToken())
                     .putLong(Constants.USER_ID, loginResponse.getId())
                     .putString(Constants.USER_NAME, loginResponse.getName())

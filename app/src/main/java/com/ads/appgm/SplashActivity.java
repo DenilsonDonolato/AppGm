@@ -37,7 +37,7 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SharedPreferenceUtil.initialize(getApplicationContext());
-        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        SharedPreferences sp = SharedPreferenceUtil.getSharedPreferences();
         lm = (LocationManager) getSystemService(Activity.LOCATION_SERVICE);
         MyNotification myNotification = MyNotification.getInstance(getApplicationContext());
         myNotification.createNotificationChannel();

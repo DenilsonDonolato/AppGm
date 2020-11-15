@@ -16,7 +16,7 @@ public class SharedPreferenceUtil {
         }
     }
 
-    public static SharedPreferences getSharedePreferences() {
+    public static SharedPreferences getSharedPreferences() {
         return mSharedePreferences;
     }
 

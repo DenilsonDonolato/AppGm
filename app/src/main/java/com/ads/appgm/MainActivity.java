@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
         setAppTheme();
 
-        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        SharedPreferences sp = SharedPreferenceUtil.getSharedPreferences();
         binding.textViewName.setText(getUserName(sp));
         setButtonPanicState(sp);
 
@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
             PaniqueQuick.getInstance().registerPaniqueManagerListener(this);
         }
         PanicManager.getInstance(true).setListener(this);
-        setButtonPanicState(SharedPreferenceUtil.getSharedePreferences());
+        setButtonPanicState(SharedPreferenceUtil.getSharedPreferences());
         instance = this;
     }
 
@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     @Override
     public void onPanicStatusChanged(final boolean status) {
-        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        SharedPreferences sp = SharedPreferenceUtil.getSharedPreferences();
         sp.edit().putBoolean(Constants.PANIC, status).apply();
         SettingsUtils.setRequestingLocationUpdates(getApplicationContext(), status);
         runOnUiThread(() -> togglePanic(status));
@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         Intent intent = new Intent(getApplicationContext(), ForegroundLocationService.class);
         intent.putExtra(Constants.EXTRA_STARTED_FROM_APP, true);
         getApplicationContext().startService(intent);
-        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        SharedPreferences sp = SharedPreferenceUtil.getSharedPreferences();
         sp.edit().putBoolean(Constants.PANIC, true).apply();
         binding.buttonPanic.setBackground(ContextCompat.getDrawable(this, R.drawable.custom_button_active));
     }

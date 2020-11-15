@@ -115,7 +115,7 @@ public class BackgroundLocationService extends Worker {
             position.add(location.getLatitude());
             position.add(location.getLongitude());
             MyLocation myLocation = new MyLocation(position, false);
-            SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+            SharedPreferences sp = SharedPreferenceUtil.getSharedPreferences();
             Call<Void> call = backEndService.postLocation(myLocation, sp.getString(Constants.USER_TOKEN, ""));
             try {
                 Response<Void> response = call.execute();

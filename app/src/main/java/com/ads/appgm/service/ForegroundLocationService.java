@@ -37,6 +37,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.permissioneverywhere.PermissionResultCallback;
 
 import org.jetbrains.annotations.NotNull;
@@ -60,6 +61,7 @@ public class ForegroundLocationService extends Service {
     private Location location;
     private Handler serviceHandler;
     private SharedPreferences sp;
+    private boolean firstActuation;
 
     public ForegroundLocationService() {
     }
@@ -108,7 +110,7 @@ public class ForegroundLocationService extends Service {
         myNotification = MyNotification.getInstance(getApplicationContext());
         myNotification.createNotificationChannel();
         SharedPreferenceUtil.initialize(getApplicationContext());
-        sp = SharedPreferenceUtil.getSharedePreferences();
+        sp = SharedPreferenceUtil.getSharedPreferences();
     }
 
     @Override
@@ -123,6 +125,10 @@ public class ForegroundLocationService extends Service {
         boolean startedFromPanicQuick = intent.getBooleanExtra(Constants.EXTRA_STARTED_FROM_PANICQUICK, false);
         boolean startedFromApp = intent.getBooleanExtra(Constants.EXTRA_STARTED_FROM_APP, false);
         boolean cancelIntent = intent.getBooleanExtra(Constants.CANCEL_INTENT, false);
+
+        if (startedFromApp || startedFromPanicQuick) {
+            sp.edit().putBoolean(Constants.FIRST_ACTUATION, true).apply();
+        }
 
         // We got here because the user decided to remove location updates from the notification.
         if (startedFromNotification || cancelIntent) {
@@ -182,7 +188,7 @@ public class ForegroundLocationService extends Service {
     };
 
     public void requestLocationUpdates() {
-        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        SharedPreferences sp = SharedPreferenceUtil.getSharedPreferences();
         startService(new Intent(getApplicationContext(), ForegroundLocationService.class));
         try {
             if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -209,7 +215,7 @@ public class ForegroundLocationService extends Service {
             fusedLocationProviderClient.removeLocationUpdates(locationCallback);
             SettingsUtils.setRequestingLocationUpdates(this, false);
             SharedPreferenceUtil.initialize(getApplicationContext());
-            SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+            SharedPreferences sp = SharedPreferenceUtil.getSharedPreferences();
             sp.edit().putBoolean(Constants.PANIC, false).apply();
             stopSelf();
         } catch (SecurityException unlikely) {
@@ -263,14 +269,12 @@ public class ForegroundLocationService extends Service {
         intent.putExtra(Constants.EXTRA_LOCATION, location);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 
-        sendLocationToBackEnd();
-//        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
-//        if (sp.getBoolean(Constants.FIRST_ACTUATION, true)) {
-//            sendLocationToBackEnd();
-//            sp.edit().putBoolean(Constants.FIRST_ACTUATION, false).apply();
-//        } else {
-//            getActuation();
-//        }
+        firstActuation = sp.getBoolean(Constants.FIRST_ACTUATION, true);
+        if (firstActuation) {
+            sendLocationToBackEnd(firstActuation);
+        } else {
+            getActuation();
+        }
         // Update notification content if running as a foreground service.
 //        if (serviceIsRunningInForeground(this)) {
 //            notificationManager.notify(NOTIFICATION_ID, getNotification());
@@ -278,7 +282,6 @@ public class ForegroundLocationService extends Service {
     }
 
     private void getActuation() {
-        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
         BackEndService client = HttpClient.getInstance();
         client.getActuation(sp.getString(Constants.USER_TOKEN, "0"), sp.getString(Constants.MEASURE_ID, "0"))
                 .enqueue(getActuationCallback);
@@ -287,22 +290,32 @@ public class ForegroundLocationService extends Service {
     Callback<Actuation> getActuationCallback = new Callback<Actuation>() {
         @Override
         public void onResponse(@NotNull Call<Actuation> call, @NotNull Response<Actuation> response) {
-
+            if (response.isSuccessful()) {
+                Actuation actuation = response.body();
+                if (!actuation.getStateId().equals("3")) {
+                    sendLocationToBackEnd(false);
+                } else {
+                    myNotification.show(getString(R.string.app_name), "Chamado encerrado", 9999, getApplicationContext());
+                }
+            }
         }
 
         @Override
         public void onFailure(@NotNull Call<Actuation> call, @NotNull Throwable t) {
-
+            FirebaseCrashlytics.getInstance().recordException(t);
+            sendLocationToBackEnd(true);
+            if (!call.isCanceled()) {
+                call.cancel();
+            }
         }
     };
 
-    private void sendLocationToBackEnd() {
+    private void sendLocationToBackEnd(boolean panic) {
         BackEndService client = HttpClient.getInstance();
         List<Double> position = new ArrayList<>(2);
         position.add(location.getLatitude());
         position.add(location.getLongitude());
-        MyLocation myLocation = new MyLocation(position, true);
-        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
+        MyLocation myLocation = new MyLocation(position, panic);
         Call<Void> call = client.postLocation(myLocation, sp.getString(Constants.USER_TOKEN, "0"));
         call.enqueue(sendLocationCallback);
     }
@@ -311,15 +324,19 @@ public class ForegroundLocationService extends Service {
         @Override
         public void onResponse(@NotNull Call<Void> call, Response<Void> response) {
             if (response.code() == 200) {
-                Toast.makeText(getApplicationContext(), "Enviou GPS", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Enviou GPS", Toast.LENGTH_SHORT).show();
+                if (firstActuation) {
+                    firstActuation = false;
+                    sp.edit().putBoolean(Constants.FIRST_ACTUATION, false).apply();
+                }
             } else {
-                Toast.makeText(getApplicationContext(), "Erro " + response.code(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Erro ao enviar GPS", Toast.LENGTH_SHORT).show();
             }
         }
 
         @Override
         public void onFailure(Call<Void> call, Throwable t) {
-            Toast.makeText(getApplicationContext(), "Erro " + t.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+            FirebaseCrashlytics.getInstance().recordException(t);
             if (!call.isCanceled()) {
                 call.cancel();
             }

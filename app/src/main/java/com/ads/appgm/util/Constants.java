@@ -54,7 +54,7 @@ public class Constants {
     public static final String CANCEL_INTENT = "CANCEL_INTENT";
     public static final String EXTRA_STARTED_FROM_APP = PACKAGE_NAME +
             ".started_from_app";
-    public static final float SMALLEST_DISPLACEMENT = 10;
+    public static final float SMALLEST_DISPLACEMENT = 1;
     public static final String FIRST_ACTUATION = "FIRST_ACTUATION";
 
     public final static String ID_DEVICE_OUTPUT = "1";
