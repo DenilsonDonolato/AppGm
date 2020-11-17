@@ -84,8 +84,10 @@ public class ForegroundLocationService extends Service {
                 if (!locationAvailability.isLocationAvailable()) {
                     Log.e(TAG, "Gps Turned Off");
                     startForeground(Constants.NOTIFICATION_ID_LIGAR_GPS, myNotification.turnOnGps(getApplicationContext()));
-                    sp.edit().putBoolean(Constants.PANIC, false).apply();
-                    SettingsUtils.setRequestingLocationUpdates(getApplicationContext(), false);
+                    if (locationManager != null && !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                        sp.edit().putBoolean(Constants.PANIC, false).apply();
+                        SettingsUtils.setRequestingLocationUpdates(getApplicationContext(), false);
+                    }
                 } else {
                     sp.edit().putBoolean(Constants.PANIC, true).apply();
                     SettingsUtils.setRequestingLocationUpdates(getApplicationContext(), true);
