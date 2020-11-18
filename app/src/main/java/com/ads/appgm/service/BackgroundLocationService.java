@@ -12,6 +12,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
@@ -74,7 +75,8 @@ public class BackgroundLocationService extends Worker {
                 ContextCompat.checkSelfPermission(getApplicationContext(),
                         Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // The PendingIntent to launch activity.
-            myNotification.openApp(getApplicationContext());
+            NotificationManagerCompat nmc = NotificationManagerCompat.from(getApplicationContext());
+            nmc.notify(Constants.GPS_PERMISSION_REQUEST, myNotification.openApp(getApplicationContext()));
             failure = true;
         }
         LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);

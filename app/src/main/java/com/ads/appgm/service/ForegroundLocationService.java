@@ -204,6 +204,7 @@ public class ForegroundLocationService extends Service {
                         locationCallback, Looper.myLooper());
             }
         } catch (SecurityException unlikely) {
+            FirebaseCrashlytics.getInstance().recordException(unlikely);
             SettingsUtils.setRequestingLocationUpdates(this, false);
             Log.e(TAG, "Lost location permission. Could not request updates. " + unlikely);
             MyPermission myPermission = MyPermission.getInstance();
@@ -221,6 +222,7 @@ public class ForegroundLocationService extends Service {
             sp.edit().putBoolean(Constants.PANIC, false).apply();
             stopSelf();
         } catch (SecurityException unlikely) {
+            FirebaseCrashlytics.getInstance().recordException(unlikely);
             SettingsUtils.setRequestingLocationUpdates(this, true);
             Log.e(TAG, "Lost location permission. Could not remove updates. " + unlikely);
             MyPermission.getInstance()
@@ -247,6 +249,7 @@ public class ForegroundLocationService extends Service {
                                 .show();
                     });
         } catch (SecurityException unlikely) {
+            FirebaseCrashlytics.getInstance().recordException(unlikely);
             Log.e(TAG, "Lost location permission." + unlikely);
             MyPermission myPermission = MyPermission.getInstance();
             myPermission.requestGPS(getApplicationContext(), permissionResultCallback);
