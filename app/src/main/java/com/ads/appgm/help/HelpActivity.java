@@ -21,7 +21,8 @@ public class HelpActivity extends AppCompatActivity {
             R.drawable.screenshot_3,
             R.drawable.screenshot_4,
             R.drawable.screenshot_5,
-            R.drawable.screenshot_6};
+            R.drawable.screenshot_6,
+            R.drawable.screenshot_7};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

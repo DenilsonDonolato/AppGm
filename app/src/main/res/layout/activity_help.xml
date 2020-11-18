@@ -22,7 +22,7 @@
         android:rotationY="0"
         app:autoPlay="false"
         app:fillColor="@color/colorPrimary"
-        app:indicatorMarginVertical="5dp"
+        app:indicatorMarginVertical="1dp"
         app:indicatorVisibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
