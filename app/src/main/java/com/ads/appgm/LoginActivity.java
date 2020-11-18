@@ -224,18 +224,18 @@ public class LoginActivity extends AppCompatActivity {
     private final Callback<Void> positionCallback = new Callback<Void>() {
         @Override
         public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
-            if (response.isSuccessful()) {
-                Toast.makeText(getApplicationContext(), "Enviou GPS", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(getApplicationContext(), "Erro ao enviar GPS", Toast.LENGTH_LONG).show();
-            }
+//            if (response.isSuccessful()) {
+//                Toast.makeText(getApplicationContext(), "Enviou GPS", Toast.LENGTH_LONG).show();
+//            } else {
+//                Toast.makeText(getApplicationContext(), "Erro ao enviar GPS", Toast.LENGTH_LONG).show();
+//            }
             goToMainActivity();
         }
 
         @Override
         public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
             FirebaseCrashlytics.getInstance().recordException(t);
-            Toast.makeText(getApplicationContext(), "Erro ao enviar GPS", Toast.LENGTH_LONG).show();
+//            Toast.makeText(getApplicationContext(), "Erro ao enviar GPS", Toast.LENGTH_LONG).show();
             goToMainActivity();
         }
     };
