@@ -37,6 +37,7 @@ public class HelpActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        setTitle("Manual");
         binding.settingsToolbar.getRoot().setNavigationOnClickListener(view -> onBackPressed());
     }
 

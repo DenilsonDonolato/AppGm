@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.preference.PreferenceManager;
 
+import com.ads.appgm.about.AboutActivity;
 import com.ads.appgm.clickListeners.ButtonPanic;
 import com.ads.appgm.databinding.ActivityMainBinding;
 import com.ads.appgm.help.HelpActivity;
@@ -268,6 +269,11 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         return super.onOptionsItemSelected(item);
     }
 
+    private void initAbout() {
+        Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+        startActivity(intent);
+    }
+
     private void initHelp() {
         Intent intent = new Intent(MainActivity.this, HelpActivity.class);
         startActivity(intent);
@@ -281,6 +287,8 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         } else if (itemId == R.id.nav_settings) {
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
+        } else if (itemId == R.id.nav_about) {
+            initAbout();
 //        } else if (itemId == R.id.nav_recordings) {
 //            Toast.makeText(this, "Clicou no Gravações", Toast.LENGTH_SHORT).show();
         }

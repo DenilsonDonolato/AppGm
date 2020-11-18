@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/settings_toolbar"
+        layout="@layout/app_toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        style="@style/textOnScreen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:lineSpacingExtra="5dp"
+        android:text="SOS Maria foi desenvolvido após a GM (Guarda Municipal) de Jundiaí identificar que muitas Medidas Protetivas vinham sendo descumpridas, ou seja, muitas mulheres estavam vulneráveis para seus agressores.
+Ao clicar no botão de pânico, sua localização será enviada para um mapa de monitoramento dentro da GM. Esse acionamento cria um alerta no mapa e permite o envio de assistência da GM até o seu local."
+        android:textAlignment="center"
+        android:textSize="22sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/settings_toolbar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
