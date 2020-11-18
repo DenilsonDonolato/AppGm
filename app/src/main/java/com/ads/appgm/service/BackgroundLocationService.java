@@ -9,7 +9,6 @@ import android.location.LocationManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationManagerCompat;
@@ -122,11 +121,11 @@ public class BackgroundLocationService extends Worker {
             try {
                 Response<Void> response = call.execute();
                 if (response.code() == 200) {
-                    mMainThreadHandler.post(() -> Toast.makeText(getApplicationContext(), "Enviou GPS", Toast.LENGTH_LONG).show());
+//                    mMainThreadHandler.post(() -> Toast.makeText(getApplicationContext(), "Enviou GPS", Toast.LENGTH_LONG).show());
                     Log.e("JOB", "Sent location");
                     result = Result.success();
                 } else {
-                    mMainThreadHandler.post(() -> Toast.makeText(getApplicationContext(), "Erro " + response.code(), Toast.LENGTH_LONG).show());
+//                    mMainThreadHandler.post(() -> Toast.makeText(getApplicationContext(), "Erro " + response.code(), Toast.LENGTH_LONG).show());
                     Log.e("JOB", "not 200");
                     result = Result.retry();
                 }

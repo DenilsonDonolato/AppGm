@@ -15,7 +15,6 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.ads.appgm.R;
 import com.ads.appgm.SplashActivity;
-import com.ads.appgm.receiver.MyBroadcastReceiver;
 import com.ads.appgm.service.ForegroundLocationService;
 
 public class MyNotification {
@@ -68,16 +67,16 @@ public class MyNotification {
 
     public Notification turnOnGps(Context context) {
         CharSequence text = context.getText(R.string.app_name);
-        Intent intent = new Intent(context, MyBroadcastReceiver.class);
-        intent.setAction("com.ads.appgm.notification");
-        intent.putExtra(Constants.EXTRA_STARTED_FROM_NOTIFICATION, Constants.NOTIFICATION_ID_LIGAR_GPS);
-        PendingIntent cancel = PendingIntent.getBroadcast(context, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+//        Intent intent = new Intent(context, MyBroadcastReceiver.class);
+//        intent.setAction("com.ads.appgm.notification");
+//        intent.putExtra(Constants.EXTRA_STARTED_FROM_NOTIFICATION, Constants.NOTIFICATION_ID_LIGAR_GPS);
+//        PendingIntent cancel = PendingIntent.getBroadcast(context, 0, intent,
+//                PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent turnOnGps = PendingIntent.getActivity(context, 0,
                 new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
         return new NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
                 .addAction(R.drawable.ic_launch, "Ligar GPS", turnOnGps)
-                .addAction(R.drawable.ic_cancel, "Cancelar", cancel)
+//                .addAction(R.drawable.ic_cancel, "Cancelar", cancel)
                 .setContentText(text)
                 .setContentTitle("SOS Maria precisa ler sua localização")
                 .setAutoCancel(true)
@@ -96,8 +95,8 @@ public class MyNotification {
         intent.putExtra(Constants.EXTRA_STARTED_FROM_NOTIFICATION, true);
 
         // The PendingIntent that leads to a call to onStartCommand() in this service.
-        PendingIntent servicePendingIntent = PendingIntent.getService(context, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+//        PendingIntent servicePendingIntent = PendingIntent.getService(context, 0, intent,
+//                PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent appIntent = new Intent(context, SplashActivity.class);
         appIntent.setAction(Intent.ACTION_MAIN);
@@ -109,12 +108,12 @@ public class MyNotification {
 
         return new NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
                 .addAction(R.drawable.ic_launch, "Abrir app", activityPendingIntent)
-                .addAction(R.drawable.ic_cancel, "Cancelar", servicePendingIntent)
+//                .addAction(R.drawable.ic_cancel, "Cancelar", servicePendingIntent)
                 .setContentText(text)
                 .setContentTitle("Sua encomenda está a caminho")
                 .setAutoCancel(true)
                 .setPriority(Notification.PRIORITY_DEFAULT)
-                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setTicker(text)
                 .build();
     }
@@ -126,7 +125,7 @@ public class MyNotification {
         Log.d("BackJOB", "Sending Permission");
         return new NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
                 .addAction(R.drawable.ic_launch, "Abrir app", activityPendingIntent)
-                .addAction(R.drawable.ic_cancel, "Cancelar", null)
+//                .addAction(R.drawable.ic_cancel, "Cancelar", null)
                 .setContentText(text)
                 .setContentTitle("SOS Maria precisa de sua atenção")
                 .setPriority(Notification.PRIORITY_DEFAULT)

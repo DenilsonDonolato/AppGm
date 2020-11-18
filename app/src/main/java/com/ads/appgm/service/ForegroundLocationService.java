@@ -17,7 +17,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -332,13 +331,13 @@ public class ForegroundLocationService extends Service {
         @Override
         public void onResponse(@NotNull Call<Void> call, Response<Void> response) {
             if (response.code() == 200) {
-                Toast.makeText(getApplicationContext(), "Enviou GPS", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "Enviou GPS", Toast.LENGTH_SHORT).show();
                 if (firstActuation) {
                     firstActuation = false;
                     sp.edit().putBoolean(Constants.FIRST_ACTUATION, false).apply();
                 }
-            } else {
-                Toast.makeText(getApplicationContext(), "Erro ao enviar GPS", Toast.LENGTH_SHORT).show();
+//            } else {
+//                Toast.makeText(getApplicationContext(), "Erro ao enviar GPS", Toast.LENGTH_SHORT).show();
             }
         }
 
