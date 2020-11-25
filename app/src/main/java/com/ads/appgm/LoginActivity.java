@@ -27,6 +27,7 @@ import com.ads.appgm.service.BackEndService;
 import com.ads.appgm.service.HttpClient;
 import com.ads.appgm.util.Animations;
 import com.ads.appgm.util.Constants;
+import com.ads.appgm.util.Expired;
 import com.ads.appgm.util.MaskEditUtil;
 import com.ads.appgm.util.MyNotification;
 import com.ads.appgm.util.MyPermission;
@@ -40,8 +41,8 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -52,7 +53,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
     private BackEndService backEndService;
-    private MyNotification myNotification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 
         binding.editTextPassword.setOnFocusChangeListener(this::onFocusChange);
 
-        myNotification = MyNotification.getInstance(getApplicationContext());
+        MyNotification myNotification = MyNotification.getInstance(getApplicationContext());
         myNotification.createNotificationChannel();
 
         binding.buttonLogin.setOnClickListener(v -> {
@@ -133,11 +133,7 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
             SharedPreferences sp = SharedPreferenceUtil.getSharedPreferences();
-            sp.edit().putString(Constants.USER_TOKEN, loginResponse.getToken())
-                    .putLong(Constants.USER_ID, loginResponse.getId())
-                    .putString(Constants.USER_NAME, loginResponse.getName())
-                    .putLong(Constants.MEASURE_ID, loginResponse.getMeasureId())
-                    .apply();
+
             int bodyStartIndex = loginResponse.getToken().indexOf(".") + 1;
             int bodyEndIndex = loginResponse.getToken().indexOf(".", bodyStartIndex);
             String bodyBase64 = loginResponse.getToken().substring(bodyStartIndex, bodyEndIndex);
@@ -147,12 +143,24 @@ public class LoginActivity extends AppCompatActivity {
             Log.e("LOGIN", "body:" + bodyJson);
             try {
                 tokenBody = new ObjectMapper().readValue(bodyJson, TokenBody.class);
-                Log.e("LOGIN", tokenBody.getExpirationTime().toString());
-                Date date = new Date(tokenBody.getExpirationTime().longValue()*1000);
-                Log.e("LOGIN", date.toString());
+                Log.e("LOGIN", (tokenBody.getExpirationTime().multiply(BigInteger.valueOf(1000L))).toString());
+                sp.edit().putLong(Constants.EXPIRATION_DATE,
+                        tokenBody.getExpirationTime().multiply(BigInteger.valueOf(1000L)).longValue()).apply();
             } catch (JsonProcessingException e) {
                 FirebaseCrashlytics.getInstance().recordException(e);
             }
+
+            if (Expired.checkExpired(getApplicationContext())) {
+                Toast.makeText(getApplicationContext(), "Medida Protetiva vencida", Toast.LENGTH_LONG).show();
+                Animations.animateView(binding.loginProgress.getRoot(), View.GONE, 0f, 150);
+                return;
+            }
+
+            sp.edit().putString(Constants.USER_TOKEN, loginResponse.getToken())
+                    .putLong(Constants.USER_ID, loginResponse.getId())
+                    .putString(Constants.USER_NAME, loginResponse.getName())
+                    .putLong(Constants.MEASURE_ID, loginResponse.getMeasureId())
+                    .apply();
             requestLocationOnSuccessfulLogin(loginResponse);
         }
 

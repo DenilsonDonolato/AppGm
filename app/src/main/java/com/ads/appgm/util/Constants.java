@@ -37,6 +37,7 @@ public class Constants {
     public static final String PANIC = "panicActive";
     public static final int NOTIFICATION_ID_FOREGROUND_SERVICE = 123;
     public static final int NOTIFICATION_ID_LIGAR_GPS = 124;
+    public static final int NOTIFICATION_ID_EXPIRATION = 125;
     public static final String NOTIFICATION_CHANNEL_ID = "SOS_MARIA";
     public static final String NOTIFICATION_CHANNEL_NAME = "SOS Maria";
     public static final String NOTIFICATION_CHANNEL_DESCRIPTION = "Notificações de SOS Maria";

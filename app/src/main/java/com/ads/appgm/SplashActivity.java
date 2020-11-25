@@ -22,10 +22,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.ads.appgm.util.Constants;
+import com.ads.appgm.util.Expired;
 import com.ads.appgm.util.MyNotification;
 import com.ads.appgm.util.SharedPreferenceUtil;
-
-import java.util.Calendar;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -43,14 +42,8 @@ public class SplashActivity extends AppCompatActivity {
         myNotification.createNotificationChannel();
 
         createDialogs();
-        Calendar now = Calendar.getInstance();
-        Log.e("DATE", now.toString());
-        //Checar validade do login
-//        String expiration = sp.getString(Constants.EXPIRATION_DATE, MyTimestamp.isoFromCalendar(now));
-//        Calendar expirationDate = MyTimestamp.
-        //Caso inválido usar sp.putLong(Constants.USER,0);
 
-        validLogin = sp.getLong(Constants.USER_ID, 0) != 0;
+        validLogin = !Expired.checkExpired(getApplicationContext());
     }
 
     private void createDialogs() {

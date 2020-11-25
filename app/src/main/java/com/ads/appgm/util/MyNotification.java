@@ -30,9 +30,16 @@ public class MyNotification {
     }
 
     public void show(String title, String content, int id, Context context) {
+        Intent appIntent = new Intent(context, SplashActivity.class);
+        appIntent.setAction(Intent.ACTION_MAIN);
+        appIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0,
+                appIntent, 0);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(title)
+                .setContentIntent(activityPendingIntent)
+                .setAutoCancel(true)
                 .setContentText(content)
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText(content))
@@ -67,6 +74,11 @@ public class MyNotification {
 
     public Notification turnOnGps(Context context) {
         CharSequence text = context.getText(R.string.app_name);
+        Intent appIntent = new Intent(context, SplashActivity.class);
+        appIntent.setAction(Intent.ACTION_MAIN);
+        appIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0,
+                appIntent, 0);
 //        Intent intent = new Intent(context, MyBroadcastReceiver.class);
 //        intent.setAction("com.ads.appgm.notification");
 //        intent.putExtra(Constants.EXTRA_STARTED_FROM_NOTIFICATION, Constants.NOTIFICATION_ID_LIGAR_GPS);
@@ -78,6 +90,7 @@ public class MyNotification {
                 .addAction(R.drawable.ic_launch, "Ligar GPS", turnOnGps)
 //                .addAction(R.drawable.ic_cancel, "Cancelar", cancel)
                 .setContentText(text)
+                .setContentIntent(activityPendingIntent)
                 .setContentTitle("SOS Maria precisa ler sua localização")
                 .setAutoCancel(true)
                 .setPriority(Notification.PRIORITY_DEFAULT)
@@ -110,6 +123,7 @@ public class MyNotification {
                 .addAction(R.drawable.ic_launch, "Abrir app", activityPendingIntent)
 //                .addAction(R.drawable.ic_cancel, "Cancelar", servicePendingIntent)
                 .setContentText(text)
+                .setContentIntent(activityPendingIntent)
                 .setContentTitle("Sua encomenda está a caminho")
                 .setAutoCancel(true)
                 .setPriority(Notification.PRIORITY_DEFAULT)
@@ -127,11 +141,29 @@ public class MyNotification {
                 .addAction(R.drawable.ic_launch, "Abrir app", activityPendingIntent)
 //                .addAction(R.drawable.ic_cancel, "Cancelar", null)
                 .setContentText(text)
+                .setContentIntent(activityPendingIntent)
                 .setContentTitle("SOS Maria precisa de sua atenção")
                 .setPriority(Notification.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setTicker(text)
+                .build();
+    }
+
+    public Notification expiration(Context context) {
+        Intent appIntent = new Intent(context, SplashActivity.class);
+        appIntent.setAction(Intent.ACTION_MAIN);
+        appIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0,
+                appIntent, 0);
+        CharSequence text = context.getText(R.string.app_name);
+        return new NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
+                .setContentTitle(text)
+                .setContentIntent(activityPendingIntent)
+                .setContentText("Encerrou a medidada protetiva.")
+                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setPriority(Notification.PRIORITY_DEFAULT)
+                .setAutoCancel(true)
                 .build();
     }
 }
