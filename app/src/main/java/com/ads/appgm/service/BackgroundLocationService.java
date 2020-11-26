@@ -21,6 +21,7 @@ import androidx.work.WorkerParameters;
 
 import com.ads.appgm.model.MyLocation;
 import com.ads.appgm.util.Constants;
+import com.ads.appgm.util.Expired;
 import com.ads.appgm.util.MyNotification;
 import com.ads.appgm.util.SharedPreferenceUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -67,6 +68,11 @@ public class BackgroundLocationService extends Worker {
         FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(getApplicationContext());
         myNotification.createNotificationChannel();
         Log.e("JOB", "Tentativas: " + this.getRunAttemptCount());
+        if (Expired.checkExpired(getApplicationContext())) {
+            WorkManager wm = WorkManager.getInstance(getApplicationContext());
+            wm.cancelAllWork();
+            return Result.success();
+        }
         cancellationToken = new CancellationTokenSource();
         boolean failure = false;
         if (ContextCompat.checkSelfPermission(getApplicationContext(),

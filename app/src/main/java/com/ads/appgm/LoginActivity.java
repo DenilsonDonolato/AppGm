@@ -144,8 +144,8 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 tokenBody = new ObjectMapper().readValue(bodyJson, TokenBody.class);
                 Log.e("LOGIN", (tokenBody.getExpirationTime().multiply(BigInteger.valueOf(1000L))).toString());
-                sp.edit().putLong(Constants.EXPIRATION_DATE,
-                        tokenBody.getExpirationTime().multiply(BigInteger.valueOf(1000L)).longValue()).apply();
+                BigInteger value = tokenBody.getExpirationTime().multiply(BigInteger.valueOf(1000L));
+                sp.edit().putLong(Constants.EXPIRATION_DATE, value.longValue()).apply();
             } catch (JsonProcessingException e) {
                 FirebaseCrashlytics.getInstance().recordException(e);
             }
@@ -184,7 +184,7 @@ public class LoginActivity extends AppCompatActivity {
             MyPermission myPermission = MyPermission.getInstance();
             myPermission.requestGPS(getApplicationContext(), permissionResponse -> {
                 if (permissionResponse.isGranted()) {
-                    requestPosition(loginResponse,fusedLocationProviderClient);
+                    requestPosition(loginResponse, fusedLocationProviderClient);
                 } else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle(R.string.app_name).setMessage("O App será encerrado")

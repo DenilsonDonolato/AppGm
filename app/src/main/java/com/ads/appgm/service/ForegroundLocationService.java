@@ -26,6 +26,7 @@ import com.ads.appgm.R;
 import com.ads.appgm.model.Actuation;
 import com.ads.appgm.model.MyLocation;
 import com.ads.appgm.util.Constants;
+import com.ads.appgm.util.Expired;
 import com.ads.appgm.util.MyNotification;
 import com.ads.appgm.util.MyPermission;
 import com.ads.appgm.util.SettingsUtils;
@@ -273,9 +274,14 @@ public class ForegroundLocationService extends Service {
         intent.putExtra(Constants.EXTRA_LOCATION, location);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 
+        if (Expired.checkExpired(getApplicationContext())) {
+            SettingsUtils.setRequestingLocationUpdates(getApplicationContext(), false);
+            removeLocationUpdates();
+            return;
+        }
         firstActuation = sp.getBoolean(Constants.FIRST_ACTUATION, true);
         if (firstActuation) {
-            sendLocationToBackEnd(firstActuation);
+            sendLocationToBackEnd(true);
         } else {
             getActuation();
         }

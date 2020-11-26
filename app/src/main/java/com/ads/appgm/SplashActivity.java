@@ -43,7 +43,7 @@ public class SplashActivity extends AppCompatActivity {
 
         createDialogs();
 
-        validLogin = !Expired.checkExpired(getApplicationContext());
+        validLogin = sp.getLong(Constants.USER_ID, -1L) > 0 && !Expired.checkExpired(getApplicationContext());
     }
 
     private void createDialogs() {
