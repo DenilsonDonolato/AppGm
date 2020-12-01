@@ -116,7 +116,7 @@ public class BackgroundLocationService extends Worker {
         }
         Location location = task.getResult();
         if (location != null) {
-            BackEndService backEndService = HttpClient.getInstance();
+            BackEndService backEndService = HttpClient.getInstance(getApplicationContext());
             Log.e("BackEnd", "sending location to backend");
             List<Double> position = new ArrayList<>(2);
             position.add(location.getLatitude());

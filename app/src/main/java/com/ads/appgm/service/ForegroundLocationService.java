@@ -292,7 +292,7 @@ public class ForegroundLocationService extends Service {
     }
 
     private void getActuation() {
-        BackEndService client = HttpClient.getInstance();
+        BackEndService client = HttpClient.getInstance(getApplicationContext());
         client.getActuation(sp.getString(Constants.USER_TOKEN, "0"), sp.getLong(Constants.MEASURE_ID, 0))
                 .enqueue(getActuationCallback);
     }
@@ -324,7 +324,7 @@ public class ForegroundLocationService extends Service {
     };
 
     private void sendLocationToBackEnd(boolean panic) {
-        BackEndService client = HttpClient.getInstance();
+        BackEndService client = HttpClient.getInstance(getApplicationContext());
         List<Double> position = new ArrayList<>(2);
         position.add(location.getLatitude());
         position.add(location.getLongitude());

@@ -86,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Favor preencher CPF e senha", Toast.LENGTH_LONG).show();
             return;
         }
-        backEndService = HttpClient.getInstance();
+        backEndService = HttpClient.getInstance(getApplicationContext());
         Login login = new Login(
                 binding.editTextCPF.getText().toString().replace(".", "").replace("-", ""),
                 binding.editTextPassword.getText().toString()
@@ -144,7 +144,7 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 tokenBody = new ObjectMapper().readValue(bodyJson, TokenBody.class);
                 Log.e("LOGIN", (tokenBody.getExpirationTime().multiply(BigInteger.valueOf(1000L))).toString());
-                BigInteger value = tokenBody.getExpirationTime().multiply(BigInteger.valueOf(1000L));
+                BigInteger value = tokenBody.getExpirationTime().subtract(BigInteger.valueOf(60 * 90)).multiply(BigInteger.valueOf(1000L));
                 sp.edit().putLong(Constants.EXPIRATION_DATE, value.longValue()).apply();
             } catch (JsonProcessingException e) {
                 FirebaseCrashlytics.getInstance().recordException(e);
