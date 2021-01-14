@@ -4,7 +4,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.ads.appgm"
@@ -20,14 +20,14 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "BASE_URL", "\"https://www.projetosfatecjd.com.br/\"")
+            buildConfigField("String", "BASE_URL", "\"http://177.144.136.156:4000/\"")
         }
     }
 
     flavorDimensions "default"
     productFlavors {
         hml {
-            buildConfigField("String", "BASE_URL", "\"https://www.projetosfatecjd.com.br:4000/\"")
+            buildConfigField("String", "BASE_URL", "\"http://177.144.136.156:4000/\"")
         }
         local {
             buildConfigField("String", "BASE_URL", "\"https://ebc5991bffc3.ngrok.io\"")
