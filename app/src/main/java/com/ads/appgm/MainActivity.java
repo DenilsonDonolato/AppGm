@@ -1,42 +1,58 @@
 package com.ads.appgm;
 
+import android.Manifest;
 import android.content.Intent;
-import android.graphics.drawable.TransitionDrawable;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
+import androidx.preference.PreferenceManager;
 
+import com.ads.appgm.about.AboutActivity;
 import com.ads.appgm.clickListeners.ButtonPanic;
 import com.ads.appgm.databinding.ActivityMainBinding;
-import com.ads.appgm.dialog.PermissionDialog;
+import com.ads.appgm.help.HelpActivity;
 import com.ads.appgm.manager.PanicManager;
 import com.ads.appgm.manager.PaniqueManagerListener;
 import com.ads.appgm.manager.device.output.OutputDeviceListener;
+import com.ads.appgm.service.BackgroundLocationService;
+import com.ads.appgm.service.ForegroundLocationService;
 import com.ads.appgm.service.PaniqueQuick;
+import com.ads.appgm.util.Constants;
 import com.ads.appgm.util.SettingsUtils;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
+import com.ads.appgm.util.SharedPreferenceUtil;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 
-public class MainActivity extends AppCompatActivity implements PaniqueManagerListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements PaniqueManagerListener,
+        OutputDeviceListener,
+        NavigationView.OnNavigationItemSelectedListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     private ActivityMainBinding binding;
     public static MainActivity instance;
 
-    private TransitionDrawable transAnimButFlash;
-
-    boolean panicButtonStatus = false;
-    int btnAnimTime = 200;
-    private FusedLocationProviderClient fusedLocationProviderClient;
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
+    private LocationManager lm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,53 +60,176 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        setAppTheme();
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        binding.panicFunction.setOnClickListener(this::openAccessibilitySettings);
+        SharedPreferences sp = SharedPreferenceUtil.getSharedPreferences();
+        binding.textViewName.setText(getUserName(sp));
+        setButtonPanicState(sp);
 
-        //transAnimButFlash = (TransitionDrawable) panicButton.getBackground();
-        //transAnimButFlash.resetTransition();
+        lm = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         setSupportActionBar(binding.toolbar.getRoot());
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.getRoot(), binding.toolbar.getRoot(),
-                R.string.open_drawer,R.string.close_drawer);
+                R.string.open_drawer, R.string.close_drawer);
         binding.getRoot().addDrawerListener(toggle);
         toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.textColor));
         toggle.syncState();
         binding.navView.setNavigationItemSelectedListener(this);
+
+        if (SettingsUtils.requestingLocationUpdates(this)) {
+            if (!checkPermissions()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    requestPermissions();
+                }
+            }
+        }
+    }
+
+    private void setButtonPanicState(SharedPreferences sp) {
+        togglePanic(sp.getBoolean("panicActive", false));
+    }
+
+    private void togglePanic(boolean isActive) {
+        if (isActive) {
+            binding.buttonPanic.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.custom_button_active));
+        } else {
+            binding.buttonPanic.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.custom_button_inactive));
+        }
+    }
+
+    private String getUserName(SharedPreferences sp) {
+        String message = "Olá";
+        String nome = sp.getString(Constants.USER_NAME, null);
+        if (nome != null) {
+            message += ", " + nome + "!";
+        } else {
+            message += "!";
+        }
+        return message;
+    }
+
+    private void setAppTheme() {
+        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        View logo = binding.navView.getHeaderView(0);
+        binding.navView.removeHeaderView(logo);
+        switch (currentNightMode) {
+            case Configuration.UI_MODE_NIGHT_NO:
+                // Night mode is not active, we're using the light theme
+                binding.navView.inflateHeaderView(R.layout.nav_header);
+                break;
+            case Configuration.UI_MODE_NIGHT_YES:
+                // Night mode is active, we're using dark theme
+                binding.navView.inflateHeaderView(R.layout.nav_header_dark);
+                break;
+        }
     }
 
     @Override
     protected void onStart() {
-        Button panic = findViewById(R.id.buttonPanic);
-
-        panic.setOnClickListener(new ButtonPanic(fusedLocationProviderClient, this));
-
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .registerOnSharedPreferenceChangeListener(this);
+        binding.buttonPanic.setOnClickListener(new ButtonPanic(this));
         super.onStart();
     }
 
     @Override
     protected void onResume() {
+        BackgroundLocationService.iniciarTemporizador(getApplicationContext());
         super.onResume();
-        if (isPaniqueQuickServiceRunning()) {
+        if (this.isPaniqueQuickServiceRunning() && PaniqueQuick.getInstance() != null) {
             PaniqueQuick.getInstance().registerPaniqueManagerListener(this);
-            if (this.isPanicOn()) {
-                this.setPanicButtonStatus(this.isPanicOn());
-            }
         }
-        binding.panicFunction.setChecked(isPaniqueQuickServiceRunning());
-        instance=this;
+        PanicManager.getInstance(true).setListener(this);
+        setButtonPanicState(SharedPreferenceUtil.getSharedPreferences());
+        instance = this;
     }
 
     @Override
     protected void onPause() {
-        if (this.isPaniqueQuickServiceRunning()) {
+        if (this.isPaniqueQuickServiceRunning() && PaniqueQuick.getInstance() != null) {
             PaniqueQuick.getInstance().unregisterPaniqueManagerListener();
-        } else if (this.isPanicOn()) {
-            this.togglePanic(null);
         }
+        PanicManager.getInstance(true).setListener(null);
+        instance = null;
         super.onPause();
-        instance=null;
+    }
+
+    @Override
+    protected void onStop() {
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
+        super.onStop();
+    }
+
+    private boolean checkPermissions() {
+        return PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+    }
+
+    private void requestPermissions() {
+        boolean shouldProvideRationale =
+                ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION);
+
+        // Provide an additional rationale to the user. This would happen if the user denied the
+        // request previously, but didn't check the "Don't ask again" checkbox.
+        if (shouldProvideRationale) {
+            Snackbar.make(
+                    findViewById(R.id.activity_main),
+                    "Precisa de GPS",
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Ok", view -> ActivityCompat.requestPermissions(MainActivity.this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            REQUEST_PERMISSIONS_REQUEST_CODE))
+                    .show();
+        } else {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_PERMISSIONS_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.i(TAG, "onRequestPermissionResult");
+        if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
+            if (grantResults.length <= 0) {
+                // If user interaction was interrupted, the permission request is cancelled and you
+                // receive empty arrays.
+                Log.i(TAG, "User interaction was cancelled.");
+            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission was granted.
+//                foregroundLocationService.requestLocationUpdates();
+                Log.i(TAG, "Can read location");
+            } else {
+                // Permission denied.
+                Snackbar.make(
+                        findViewById(R.id.activity_main),
+                        "Precisa do GPS",
+                        Snackbar.LENGTH_INDEFINITE)
+                        .setAction(R.string.settings, view -> {
+                            // Build intent that displays the App settings screen.
+                            Intent intent = new Intent();
+                            intent.setAction(
+                                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                            Uri uri = Uri.fromParts("package",
+                                    BuildConfig.APPLICATION_ID, null);
+                            intent.setData(uri);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                        })
+                        .show();
+            }
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        // Update the buttons state depending on whether location updates are being requested.
+        if (key.equals(SettingsUtils.KEY_REQUESTING_LOCATION_UPDATES)) {
+            Log.i(TAG, "Status Changed");
+            onPanicStatusChanged(sharedPreferences.getBoolean(key, false));
+        }
     }
 
     @Override
@@ -100,88 +239,58 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
 
     @Override
     public void onPanicStatusChanged(final boolean status) {
-        runOnUiThread(() -> setPanicButtonStatus(status));
+        SharedPreferences sp = SharedPreferenceUtil.getSharedPreferences();
+        sp.edit().putBoolean(Constants.PANIC, status).apply();
+        SettingsUtils.setRequestingLocationUpdates(getApplicationContext(), status);
+        runOnUiThread(() -> togglePanic(status));
     }
 
-    public void openAccessibilitySettings(View v) {
-        if (binding.panicFunction.isChecked()) {
-            Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
-            startActivity(intent);
-        } else {
-            this.showDialogPermission();
-        }
-    }
-
-    private void showDialogPermission() {
-        PermissionDialog permissionDialog = new PermissionDialog();
-        permissionDialog.show(getFragmentManager(), "Permission Dialog");
-    }
-
-    private void setPanicButtonStatus(boolean enabled) {
-        panicButtonStatus = enabled;
-        if (panicButtonStatus) {
-            //transAnimButFlash.startTransition(btnAnimTime);
-        } else {
-            //transAnimButFlash.reverseTransition(btnAnimTime);
-        }
+    @Override
+    public void onStatusChanged(String deviceType, boolean status) {
+        runOnUiThread(() -> togglePanic(status));
     }
 
     private boolean isPaniqueQuickServiceRunning() {
         return PaniqueQuick.getInstance() != null;
     }
 
-    public void togglePanic(View v) {
-        if (isPaniqueQuickServiceRunning()) {
-            PaniqueQuick.getInstance().togglePanic();
-        } else {
-            PanicManager.getInstance(SettingsUtils.getPanicSource(this), true).setListener(new OutputDeviceListener() {
-                @Override
-                public void onStatusChanged(String deviceType, final boolean status) {
-                    runOnUiThread(() -> setPanicButtonStatus(status));
-                }
-
-                @Override
-                public void onError(String error) {
-                    Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT).show();
-                }
-            });
-            PanicManager.getInstance(SettingsUtils.getPanicSource(this), true).toggle(this);
-        }
-    }
-
-    private boolean isPanicOn() {
-        if (isPaniqueQuickServiceRunning()) {
-            return PaniqueQuick.getInstance().getPanicStatus();
-        } else {
-            return PanicManager.getInstance(SettingsUtils.getPanicSource(this), true).getStatus();
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu,menu);
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_help:
-                Toast.makeText(this,"TODO: Mostrar tela de ajuda.",Toast.LENGTH_LONG).show();
-                break;
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_help) {
+            initHelp();
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void initAbout() {
+        Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+        startActivity(intent);
+    }
+
+    private void initHelp() {
+        Intent intent = new Intent(MainActivity.this, HelpActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.nav_recordings:
-                Toast.makeText(this,"Clicou no Gravações",Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.nav_settings:
-                Toast.makeText(this,"Clicou no Configurações",Toast.LENGTH_SHORT).show();
-                break;
+        int itemId = item.getItemId();
+        if (itemId == R.id.nav_help) {
+            initHelp();
+        } else if (itemId == R.id.nav_settings) {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        } else if (itemId == R.id.nav_about) {
+            initAbout();
+//        } else if (itemId == R.id.nav_recordings) {
+//            Toast.makeText(this, "Clicou no Gravações", Toast.LENGTH_SHORT).show();
         }
         binding.getRoot().closeDrawer(GravityCompat.START);
 
@@ -195,5 +304,30 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Constants.GPS_TURN_ON) {
+            if (gpsLigado()) {
+                startForegroundService();
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.gps_off_warning, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    public boolean gpsLigado() {
+        return lm != null && lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+    public void startForegroundService() {
+        Intent intent = new Intent(getApplicationContext(), ForegroundLocationService.class);
+        intent.putExtra(Constants.EXTRA_STARTED_FROM_APP, true);
+        getApplicationContext().startService(intent);
+        SharedPreferences sp = SharedPreferenceUtil.getSharedPreferences();
+        sp.edit().putBoolean(Constants.PANIC, true).apply();
+        binding.buttonPanic.setBackground(ContextCompat.getDrawable(this, R.drawable.custom_button_active));
     }
 }

@@ -23,16 +23,39 @@ package com.ads.appgm.util;
  */
 
 public class Constants {
-    public final static String ID_DEVICE = "0";
+    public static final String ID_DEVICE = "0";
     public static final int LOGIN_INTENT_REQUEST = 1;
     public static final int GPS_PERMISSION_REQUEST = 2;
     public static final int GPS_TURN_ON = 3;
+    public static final int REQUEST_PERMISSION_SETTING = 4;
     public static final String SHARED_PREFERENCES = "com.ads.appgm.appgm_preferences";
     public static final String USER_TOKEN = "API_TOKEN";
     public static final String USER_ID = "USER_ID";
     public static final String USER_NAME = "USER_NAME";
+    public static final String MEASURE_ID = "MEASURE_ID";
+    public static final String EXPIRATION_DATE = "EXPIRATION_DATE";
+    public static final String PANIC = "panicActive";
+    public static final int NOTIFICATION_ID_FOREGROUND_SERVICE = 123;
+    public static final int NOTIFICATION_ID_LIGAR_GPS = 124;
+    public static final String NOTIFICATION_CHANNEL_ID = "SOS_MARIA";
+    public static final String NOTIFICATION_CHANNEL_NAME = "SOS Maria";
+    public static final String NOTIFICATION_CHANNEL_DESCRIPTION = "Notificações de SOS Maria";
 
-
+    public static final String PACKAGE_NAME = "com.ads.appgm";
+    public static final String ACTION_BROADCAST = PACKAGE_NAME + ".broadcast";
+    public static final String EXTRA_LOCATION = PACKAGE_NAME + ".location";
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
+            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+    public static final String EXTRA_STARTED_FROM_NOTIFICATION = PACKAGE_NAME +
+            ".started_from_notification";
+    public static final String EXTRA_STARTED_FROM_PANICQUICK = PACKAGE_NAME +
+            ".started_from_panicquick";
+    public static final String CANCEL_INTENT = "CANCEL_INTENT";
+    public static final String EXTRA_STARTED_FROM_APP = PACKAGE_NAME +
+            ".started_from_app";
+    public static final float SMALLEST_DISPLACEMENT = 1;
+    public static final String FIRST_ACTUATION = "FIRST_ACTUATION";
 
     public final static String ID_DEVICE_OUTPUT = "1";
     public final static String ID_DEVICE_OUTPUT_PANIC = "10";

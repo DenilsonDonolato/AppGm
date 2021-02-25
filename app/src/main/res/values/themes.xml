@@ -44,4 +44,5 @@
     <style name="panicSwitch" parent="textOnScreen">
         <item name="android:background">@color/colorLightBlue</item>
     </style>
+
 </resources>

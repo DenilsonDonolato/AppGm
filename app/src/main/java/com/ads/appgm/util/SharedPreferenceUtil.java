@@ -6,11 +6,17 @@ import android.content.SharedPreferences;
 public class SharedPreferenceUtil {
     private static SharedPreferences mSharedePreferences;
 
-    public SharedPreferenceUtil(Context context) {
-        SharedPreferenceUtil.mSharedePreferences = context.getApplicationContext().getSharedPreferences(Constants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
+    private SharedPreferenceUtil() {
     }
 
-    public static SharedPreferences getSharedePreferences() {
+    public static void initialize(Context context) {
+        if( mSharedePreferences == null) {
+            SharedPreferenceUtil.mSharedePreferences = context.getApplicationContext()
+                    .getSharedPreferences(Constants.SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        }
+    }
+
+    public static SharedPreferences getSharedPreferences() {
         return mSharedePreferences;
     }
 

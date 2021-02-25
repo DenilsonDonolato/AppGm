@@ -1,10 +1,6 @@
 package com.ads.appgm.service;
 
-import android.content.SharedPreferences;
-
 import com.ads.appgm.BuildConfig;
-import com.ads.appgm.util.Constants;
-import com.ads.appgm.util.SharedPreferenceUtil;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,8 +24,6 @@ public class HttpClient {
     }
 
     private static BackEndService buildHttpClient() {
-        SharedPreferences sp = SharedPreferenceUtil.getSharedePreferences();
-        String token = sp.getString(Constants.USER_TOKEN,"no_token");
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)

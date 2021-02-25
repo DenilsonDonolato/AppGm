@@ -5,11 +5,15 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,39 +21,83 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.ads.appgm.notification.Notification;
 import com.ads.appgm.util.Constants;
+import com.ads.appgm.util.MyNotification;
 import com.ads.appgm.util.SharedPreferenceUtil;
+
+import java.util.Calendar;
 
 public class SplashActivity extends AppCompatActivity {
 
-    boolean validLogin;
+    private boolean validLogin;
     private LocationManager lm;
+    private AlertDialog permission,rationale,enableGps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //TODO validacao de Login
-        validLogin = false;
+        SharedPreferenceUtil.initialize(getApplicationContext());
+        SharedPreferences sp = SharedPreferenceUtil.getSharedPreferences();
         lm = (LocationManager) getSystemService(Activity.LOCATION_SERVICE);
-        Notification notification = new Notification(getApplicationContext());
-        notification.createNotificationChannel();
-        new SharedPreferenceUtil(getApplicationContext());
+        MyNotification myNotification = MyNotification.getInstance(getApplicationContext());
+        myNotification.createNotificationChannel();
+
+        createDialogs();
+        Calendar now = Calendar.getInstance();
+        Log.e("DATE", now.toString());
+        //Checar validade do login
+//        String expiration = sp.getString(Constants.EXPIRATION_DATE, MyTimestamp.isoFromCalendar(now));
+//        Calendar expirationDate = MyTimestamp.
+        //Caso inválido usar sp.putLong(Constants.USER,0);
+
+        validLogin = sp.getLong(Constants.USER_ID, 0) != 0;
+    }
+
+    private void createDialogs() {
+        if(enableGps == null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            enableGps = builder.setTitle(R.string.GPS).setMessage(R.string.reason_gps)
+                    .setNegativeButton(R.string.close, listenerGpsOn)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.turn_on_gps, listenerGpsOn)
+                    .create();
+        }
+        if(rationale == null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            rationale = builder.setTitle(R.string.app_name).setMessage(R.string.reason_location_rationale)
+                    .setNegativeButton(R.string.close, listenerRationalePermission)
+                    .setCancelable(false)
+                    .setPositiveButton("Configurações", listenerLocationPermission)
+                    .create();
+        }
+        if (permission == null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            permission = builder.setTitle(R.string.GPS).setMessage(R.string.reason_location)
+                    .setNegativeButton(R.string.close, listenerLocationPermission)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.allow_gps, listenerLocationPermission)
+                    .create();
+        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
+        permissionCheckAndRequest();
+    }
+
+    private void permissionCheckAndRequest() {
         if (ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(getApplicationContext(),
                         Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // You can use the API that requires the permission.
             startApp();
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                showGPSDialog();
+            if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) ||
+                    shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+                showRationaleDialog();
                 // You can directly ask for the permission.
                 //Permissoes sao automaticas antes da versão 23
             } else {
@@ -66,7 +114,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void startApp() {
-        if(gpsLigado()){
+        if (gpsLigado()) {
             if (validLogin) {
                 goToMainActivity();
             } else {
@@ -82,17 +130,17 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void showTurnOnGps() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.GPS).setMessage(R.string.reason_gps)
-                .setNegativeButton(R.string.close, listenerGpsOn)
-                .setCancelable(false)
-                .setPositiveButton(R.string.turn_on_gps, listenerGpsOn)
-                .show();
+        if (!enableGps.isShowing()) {
+            enableGps.show();
+            rationale.dismiss();
+            permission.dismiss();
+        }
     }
 
     private void goToLoginActivity() {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-        startActivityForResult(intent, Constants.LOGIN_INTENT_REQUEST);
+        startActivity(intent);
+        finish();
     }
 
     private void goToMainActivity() {
@@ -105,22 +153,23 @@ public class SplashActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case Constants.LOGIN_INTENT_REQUEST:
-                if (resultCode == RESULT_OK) {
-                    goToMainActivity();
-                } else {
-                    finish();
-                }
-                break;
             case Constants.GPS_PERMISSION_REQUEST:
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     startApp();
                 } else {
                     showGPSDialog();
                 }
                 break;
             case Constants.GPS_TURN_ON:
-                startApp();
+                if (gpsLigado()) {
+                    startApp();
+                } else {
+                    Toast.makeText(getApplicationContext(), R.string.gps_off_warning, Toast.LENGTH_LONG).show();
+                    finishAffinity();
+                }
+                break;
+            case Constants.REQUEST_PERMISSION_SETTING:
+                permissionCheckAndRequest();
                 break;
             default:
                 goToLoginActivity();
@@ -154,24 +203,52 @@ public class SplashActivity extends AppCompatActivity {
                     // At the same time, respect the user's decision. Don't link to
                     // system settings in an effort to convince the user to change
                     // their decision.
-                    showGPSDialog();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+                            showRationaleDialog();
+                        }
+                    } else {
+                        showGPSDialog();
+                    }
                 }
-                return;
+                break;
+            default:
+                Log.e("SPLASH", "case default, request code=" + requestCode);
+                break;
         }
         // Other 'case' lines to check for other
         // permissions this app might request.
     }
 
-    private void showGPSDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.GPS).setMessage(R.string.reason_location)
-                .setNegativeButton(R.string.close, listenerLocationPermission)
-                .setCancelable(false)
-                .setPositiveButton(R.string.allow_gps, listenerLocationPermission)
-                .show();
+    private void showRationaleDialog() {
+        if (!rationale.isShowing()) {
+            rationale.show();
+            permission.dismiss();
+            enableGps.dismiss();
+        }
     }
 
-    private DialogInterface.OnClickListener listenerLocationPermission = (dialog, which) -> {
+    private void showGPSDialog() {
+        if (!permission.isShowing()) {
+            permission.show();
+            rationale.dismiss();
+            enableGps.dismiss();
+        }
+    }
+
+    private final DialogInterface.OnClickListener listenerLocationPermission = (dialog, which) -> {
+        if (which == Dialog.BUTTON_POSITIVE) {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Uri uri = Uri.fromParts("package", getPackageName(), null);
+            intent.setData(uri);
+            startActivityForResult(intent, Constants.REQUEST_PERMISSION_SETTING);
+        } else {
+            dialog.dismiss();
+            finishAffinity();
+        }
+    };
+
+    private final DialogInterface.OnClickListener listenerRationalePermission = (dialog, which) -> {
         if (which == Dialog.BUTTON_POSITIVE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -189,13 +266,30 @@ public class SplashActivity extends AppCompatActivity {
         }
     };
 
-    private DialogInterface.OnClickListener listenerGpsOn = (dialog, which) -> {
+    private final DialogInterface.OnClickListener listenerGpsOn = (dialog, which) -> {
         if (which == Dialog.BUTTON_POSITIVE) {
             Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivityForResult(intent,Constants.GPS_TURN_ON);
+            startActivityForResult(intent, Constants.GPS_TURN_ON);
         } else {
             dialog.dismiss();
             finishAffinity();
         }
     };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (enableGps!=null) {
+            enableGps.dismiss();
+            enableGps = null;
+        }
+        if (permission != null) {
+            permission.dismiss();
+            permission = null;
+        }
+        if (rationale != null) {
+            rationale.dismiss();
+            rationale = null;
+        }
+    }
 }
