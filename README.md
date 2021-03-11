@@ -16,10 +16,7 @@ Para o App conseguir acessar o mock utilize o [ngrok](https://ngrok.com/) e alte
 ```
     productFlavors {
         hml {
-            buildConfigField("String", "BASE_URL", "\"http://177.144.136.156:4000/\"")
-        }
-        local {
-            buildConfigField("String", "BASE_URL", "\"https://ebc5991bffc3.ngrok.io\"")
+            buildConfigField("String", "BASE_URL", "\"https://495430155619.ngrok.io/\"")
         }
     }
 ```
