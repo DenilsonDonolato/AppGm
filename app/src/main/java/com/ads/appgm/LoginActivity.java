@@ -145,14 +145,23 @@ public class LoginActivity extends AppCompatActivity {
             String bodyJson = new String(bodyBytes);
             TokenBody tokenBody;
             Log.e("LOGIN", "body:" + bodyJson);
+
             try {
                 tokenBody = new ObjectMapper().readValue(bodyJson, TokenBody.class);
-                Log.e("LOGIN", tokenBody.getExpirationTime().toString());
-                Date date = new Date(tokenBody.getExpirationTime().longValue()*1000);
-                Log.e("LOGIN", date.toString());
+
+                long exp = Long.parseLong(tokenBody.getExpirationTime().toString());
+                Log.e("EXP :", String.valueOf(exp));
+
+                long iat = Long.parseLong(tokenBody.getIssuedAt().toString());
+                Log.e("IAT :", String.valueOf(iat));
+
+                long measureExpiration = exp - iat;
+                sp.edit().putString(Constants.EXPIRATION_DATE, String.valueOf(measureExpiration)).apply();
+
             } catch (JsonProcessingException e) {
                 FirebaseCrashlytics.getInstance().recordException(e);
             }
+
             requestLocationOnSuccessfulLogin(loginResponse);
         }
 

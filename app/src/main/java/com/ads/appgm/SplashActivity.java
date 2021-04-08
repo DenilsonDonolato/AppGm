@@ -23,9 +23,14 @@ import androidx.core.content.ContextCompat;
 
 import com.ads.appgm.util.Constants;
 import com.ads.appgm.util.MyNotification;
+import com.ads.appgm.util.MyTimestamp;
 import com.ads.appgm.util.SharedPreferenceUtil;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.time.Instant;
 import java.util.Calendar;
+import java.util.Date;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -44,13 +49,24 @@ public class SplashActivity extends AppCompatActivity {
 
         createDialogs();
         Calendar now = Calendar.getInstance();
-        Log.e("DATE", now.toString());
-        //Checar validade do login
-//        String expiration = sp.getString(Constants.EXPIRATION_DATE, MyTimestamp.isoFromCalendar(now));
-//        Calendar expirationDate = MyTimestamp.
-        //Caso inválido usar sp.putLong(Constants.USER,0);
+//        Log.e("DATE", now.toString());
 
-        validLogin = sp.getLong(Constants.USER_ID, 0) != 0;
+        String measureExpiration = sp.getString(Constants.EXPIRATION_DATE, String.valueOf(now.getTimeInMillis()));
+
+        Log.e("Expiration", measureExpiration);
+
+        long dataAtual = now.getTimeInMillis();
+//        long dataExpiracaoMedida = Long.parseLong(measureExpiration);
+        long dataExpiracaoMedida = 1586357572000L; // Data de 2020
+
+        if(dataExpiracaoMedida <= dataAtual) {
+            Log.e("LOGIN AUTORIZADO: ", "FALSE");
+            validLogin = false;
+        } else {
+            Log.e("LOGIN AUTORIZADO: ", "TRUE");
+            validLogin = true;
+        }
+
     }
 
     private void createDialogs() {
