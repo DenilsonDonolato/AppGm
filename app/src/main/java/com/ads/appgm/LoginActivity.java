@@ -149,36 +149,9 @@ public class LoginActivity extends AppCompatActivity {
                     .putLong(Constants.USER_ID, loginResponse.getId())
                     .putString(Constants.USER_NAME, loginResponse.getName())
                     .putLong(Constants.MEASURE_ID, loginResponse.getMeasureId())
-                    .putString("DATA_GMT", loginResponse.getMeasureValidity())
+                    .putString(Constants.EXPIRATION_DATE, loginResponse.getMeasureValidity())
+                    .putBoolean(Constants.FIRST_LOGIN, false)
                     .apply();
-            int bodyStartIndex = loginResponse.getToken().indexOf(".") + 1;
-            int bodyEndIndex = loginResponse.getToken().indexOf(".", bodyStartIndex);
-            String bodyBase64 = loginResponse.getToken().substring(bodyStartIndex, bodyEndIndex);
-            byte[] bodyBytes = android.util.Base64.decode(bodyBase64, Base64.DEFAULT);
-            String bodyJson = new String(bodyBytes);
-            TokenBody tokenBody;
-            Log.e("LOGIN", "body:" + bodyJson);
-
-            try {
-                tokenBody = new ObjectMapper().readValue(bodyJson, TokenBody.class);
-
-                long exp = Long.parseLong(tokenBody.getExpirationTime().toString());
-                Log.e("EXP :", String.valueOf(exp));
-
-                long iat = Long.parseLong(tokenBody.getIssuedAt().toString());
-                Log.e("IAT :", String.valueOf(iat));
-
-//                long measureExpiration = exp - iat;
-                long measureExpiration = Long.parseLong(sp.getString("DATA_GMT", ""));
-
-                sp.edit()
-                        .putString(Constants.EXPIRATION_DATE, String.valueOf(measureExpiration))
-                        .putBoolean(Constants.FIRST_LOGIN, false)
-                        .apply();
-
-            } catch (JsonProcessingException e) {
-                FirebaseCrashlytics.getInstance().recordException(e);
-            }
 
             requestLocationOnSuccessfulLogin(loginResponse);
         }

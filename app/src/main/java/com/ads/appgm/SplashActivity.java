@@ -54,23 +54,17 @@ public class SplashActivity extends AppCompatActivity {
 
         createDialogs();
         firstLogin = sp.getBoolean(Constants.FIRST_LOGIN, true);
-        Calendar now = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
+        /*
+            Timestamp 1970 till now  - 10800000 (Brazilian OffSet)
+         */
+        long now = calendar.getTimeInMillis() - 10800000L;
 
-        String measureExpiration = sp.getString(Constants.EXPIRATION_DATE, String.valueOf(now.getTimeInMillis()));
-
-        Log.e("Expiration", measureExpiration);
-
-        long dataAtual = now.getTimeInMillis() - 10800000L; // Brasil offset
-        long dataExpiracaoMedida = Long.parseLong(measureExpiration);
-        //long dataExpiracaoMedida = 1586357572000L; // Data de 2020
-
-        Log.e("DATA ATUAL", String.valueOf(dataAtual));
-
-
-        System.out.println();
+        String measureExpiration = sp.getString(Constants.EXPIRATION_DATE, String.valueOf(now));
+        long loginExpiration = Long.parseLong(measureExpiration);
 
         if(!firstLogin) {
-            if(dataExpiracaoMedida <= dataAtual) {
+            if(loginExpiration <= now) {
                 Log.e("LOGIN AUTORIZADO: ", "FALSE");
                 validLogin = false;
             } else {
