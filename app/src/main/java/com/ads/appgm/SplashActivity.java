@@ -29,14 +29,19 @@ import com.ads.appgm.util.SharedPreferenceUtil;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class SplashActivity extends AppCompatActivity {
 
     private boolean validLogin;
+    private boolean firstLogin;
     private LocationManager lm;
-    private AlertDialog permission,rationale,enableGps;
+    private AlertDialog permission,rationale,enableGps, expiredLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,25 +53,34 @@ public class SplashActivity extends AppCompatActivity {
         myNotification.createNotificationChannel();
 
         createDialogs();
+        firstLogin = sp.getBoolean(Constants.FIRST_LOGIN, true);
         Calendar now = Calendar.getInstance();
-//        Log.e("DATE", now.toString());
 
         String measureExpiration = sp.getString(Constants.EXPIRATION_DATE, String.valueOf(now.getTimeInMillis()));
 
         Log.e("Expiration", measureExpiration);
 
-        long dataAtual = now.getTimeInMillis();
-//        long dataExpiracaoMedida = Long.parseLong(measureExpiration);
-        long dataExpiracaoMedida = 1586357572000L; // Data de 2020
+        long dataAtual = now.getTimeInMillis() - 10800000L; // Brasil offset
+        long dataExpiracaoMedida = Long.parseLong(measureExpiration);
+        //long dataExpiracaoMedida = 1586357572000L; // Data de 2020
 
-        if(dataExpiracaoMedida <= dataAtual) {
-            Log.e("LOGIN AUTORIZADO: ", "FALSE");
-            validLogin = false;
+        Log.e("DATA ATUAL", String.valueOf(dataAtual));
+
+
+        System.out.println();
+
+        if(!firstLogin) {
+            if(dataExpiracaoMedida <= dataAtual) {
+                Log.e("LOGIN AUTORIZADO: ", "FALSE");
+                validLogin = false;
+            } else {
+                Log.e("LOGIN AUTORIZADO: ", "TRUE");
+                validLogin = true;
+            }
         } else {
-            Log.e("LOGIN AUTORIZADO: ", "TRUE");
-            validLogin = true;
+            // First Login
+            validLogin = false;
         }
-
     }
 
     private void createDialogs() {
@@ -92,6 +106,17 @@ public class SplashActivity extends AppCompatActivity {
                     .setNegativeButton(R.string.close, listenerLocationPermission)
                     .setCancelable(false)
                     .setPositiveButton(R.string.allow_gps, listenerLocationPermission)
+                    .create();
+        }
+        if(expiredLogin == null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            expiredLogin = builder.setTitle("Login expirado").setMessage(R.string.login_expired)
+                    .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            goToLoginActivity();
+                        }
+                    })
                     .create();
         }
     }
@@ -129,12 +154,23 @@ public class SplashActivity extends AppCompatActivity {
         }
     }
 
+    private void showExpiredLogin() {
+        expiredLogin.show();
+    }
+
+
     private void startApp() {
         if (gpsLigado()) {
-            if (validLogin) {
+            if (!firstLogin && validLogin) {
+                Log.e("LOGIN STATUS: ", "AINDA ESTA VALIDO");
                 goToMainActivity();
-            } else {
+            } else if(firstLogin && !validLogin){
+                Log.e("LOGIN STATUS: ", "AINDA NAO FOI FEITO LOGIN");
                 goToLoginActivity();
+            } else if(!firstLogin && !validLogin) {
+                // Login expirou
+                Log.e("LOGIN STATUS: ", "EXPIRADO");
+                showExpiredLogin();
             }
         } else {
             showTurnOnGps();
