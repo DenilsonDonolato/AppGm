@@ -32,6 +32,7 @@ import com.ads.appgm.help.HelpActivity;
 import com.ads.appgm.manager.PanicManager;
 import com.ads.appgm.manager.PaniqueManagerListener;
 import com.ads.appgm.manager.device.output.OutputDeviceListener;
+import com.ads.appgm.recorder.RecorderActivity;
 import com.ads.appgm.service.BackgroundLocationService;
 import com.ads.appgm.service.ForegroundLocationService;
 import com.ads.appgm.service.PaniqueQuick;
@@ -289,12 +290,17 @@ public class MainActivity extends AppCompatActivity implements PaniqueManagerLis
             startActivity(intent);
         } else if (itemId == R.id.nav_about) {
             initAbout();
-//        } else if (itemId == R.id.nav_recordings) {
-//            Toast.makeText(this, "Clicou no Gravações", Toast.LENGTH_SHORT).show();
+        } else if (itemId == R.id.nav_recordings) {
+            initRecorder();
         }
         binding.getRoot().closeDrawer(GravityCompat.START);
 
         return false;
+    }
+
+    private void initRecorder() {
+        Intent intent = new Intent(this, RecorderActivity.class);
+        startActivity(intent);
     }
 
     @Override

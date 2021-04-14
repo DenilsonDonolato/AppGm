@@ -6,6 +6,7 @@ public class LoginResponse {
     private long id;
     private String name;
     private long measureId;
+    private String measureValidity;
 
     public LoginResponse() {
     }
@@ -40,5 +41,25 @@ public class LoginResponse {
 
     public void setMeasureId(long measureId) {
         this.measureId = measureId;
+    }
+
+    public String getMeasureValidity() {
+        return measureValidity;
+    }
+
+    public void setMeasureValidity(String measureValidity) {
+        this.measureValidity = measureValidity;
+    }
+
+
+    @Override
+    public String toString() {
+        return "LoginResponse{" +
+                "token='" + token + '\'' +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", measureId=" + measureId +
+                ", measureValidity='" + measureValidity + '\'' +
+                '}';
     }
 }

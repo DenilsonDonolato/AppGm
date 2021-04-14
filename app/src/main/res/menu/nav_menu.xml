@@ -2,21 +2,27 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:id="@+id/nav_group_main">
-<!--        <item android:id="@+id/nav_recordings"-->
-<!--            android:icon="@drawable/microphone"-->
-<!--            android:title="@string/records"/>-->
+
+        <item android:id="@+id/nav_recordings"
+            android:icon="@drawable/microphone"
+            android:title="@string/records"/>
+
         <item android:id="@+id/nav_settings"
             android:icon="@drawable/ic_settings"
             android:title="@string/settings"/>
     </group>
+
     <group android:id="@+id/nav_group_about">
+
         <item
             android:id="@+id/nav_help"
             android:icon="@drawable/ic_help_outline"
             android:title="@string/user_guide" />
+
         <item android:id="@+id/nav_about"
             android:icon="@drawable/ic_outline_info_24"
             android:title="@string/about"/>
+
     </group>
 
 </menu>

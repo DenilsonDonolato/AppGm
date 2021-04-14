@@ -39,11 +39,17 @@ import com.google.android.gms.location.LocationServices;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import okhttp3.MediaType;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -119,7 +125,13 @@ public class LoginActivity extends AppCompatActivity {
         public void onResponse(@NotNull Call<LoginResponse> call, @NotNull Response<LoginResponse> response) {
             if (!response.isSuccessful()) {
                 if (response.code() == 401) {
-                    Toast.makeText(getApplicationContext(), "Erro de Autenticação", Toast.LENGTH_LONG).show();
+
+                    if (response.errorBody().contentType() != null) {
+                        Toast.makeText(getApplicationContext(), "Login expirado", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Usuario ou senha incorretos", Toast.LENGTH_LONG).show();
+                    }
+
                 } else {
                     Toast.makeText(getApplicationContext(), "Erro de Servidor", Toast.LENGTH_LONG).show();
                 }
@@ -137,22 +149,10 @@ public class LoginActivity extends AppCompatActivity {
                     .putLong(Constants.USER_ID, loginResponse.getId())
                     .putString(Constants.USER_NAME, loginResponse.getName())
                     .putLong(Constants.MEASURE_ID, loginResponse.getMeasureId())
+                    .putString(Constants.EXPIRATION_DATE, loginResponse.getMeasureValidity())
+                    .putBoolean(Constants.FIRST_LOGIN, false)
                     .apply();
-            int bodyStartIndex = loginResponse.getToken().indexOf(".") + 1;
-            int bodyEndIndex = loginResponse.getToken().indexOf(".", bodyStartIndex);
-            String bodyBase64 = loginResponse.getToken().substring(bodyStartIndex, bodyEndIndex);
-            byte[] bodyBytes = android.util.Base64.decode(bodyBase64, Base64.DEFAULT);
-            String bodyJson = new String(bodyBytes);
-            TokenBody tokenBody;
-            Log.e("LOGIN", "body:" + bodyJson);
-            try {
-                tokenBody = new ObjectMapper().readValue(bodyJson, TokenBody.class);
-                Log.e("LOGIN", tokenBody.getExpirationTime().toString());
-                Date date = new Date(tokenBody.getExpirationTime().longValue()*1000);
-                Log.e("LOGIN", date.toString());
-            } catch (JsonProcessingException e) {
-                FirebaseCrashlytics.getInstance().recordException(e);
-            }
+
             requestLocationOnSuccessfulLogin(loginResponse);
         }
 
